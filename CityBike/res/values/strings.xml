@@ -4,5 +4,15 @@
     <string name="app_name">CityBike</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="todo">TODO</string>
+    <string name="Perfil">Perfil</string>
+    <string name="Circuitos">Circuitos</string>
+    <string name="Configuracion">Configuracion</string>
+    <string name="Rutas">Rutas</string>
+    <string name="Contactos">Contactos</string>
+    <string name="Comprar">Comprar</string>
+    <string name="Estaciones">Estaciones</string>
+    <string name="Facebook">Facebook</string>
+    <string name="Talleres">Talleres</string>
 
 </resources>

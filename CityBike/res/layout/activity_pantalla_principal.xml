@@ -1,14 +1,243 @@
-<!-- <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/container"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="com.citybike.PantallaPrincipal"
-    tools:ignore="MergeRootFrame" />  -->
-    
-      <fragment 
-          xmlns:android="http://schemas.android.com/apk/res/android" 
-          android:id="@+id/map" 
-          android:layout_width="match_parent" 
-          android:layout_height="match_parent" 
-          class="com.google.android.gms.maps.SupportMapFragment" /> 
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >
+
+      <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+         <include
+             android:layout_width="fill_parent"
+             android:layout_height="fill_parent"
+             layout="@layout/fragment_pantalla_principal" />
+	
+	     <View
+	          android:id="@+id/imageView123"
+	          android:layout_width="match_parent"
+	          android:layout_height="250dp"
+	          android:background="#00000000" />
+    </RelativeLayout>
+
+    <SlidingDrawer
+        android:id="@+id/slidingDrawer1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:content="@+id/content"
+        android:handle="@+id/handle"
+        android:orientation="vertical" >
+
+        <LinearLayout
+            android:id="@+id/handle"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:background="#00000000"
+            android:gravity="center" >
+
+			 <ImageView
+			     android:id="@+id/startbikeapp"
+			     android:layout_width="40dp"
+			     android:layout_height="wrap_content"
+			     android:adjustViewBounds="true"
+			     android:background="@drawable/startbikeapp"
+			     android:contentDescription="@string/todo"
+			     android:scaleType="fitEnd" />
+
+        </LinearLayout>
+
+        <GridLayout
+            android:id="@+id/content"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="#80000000"
+            android:columnCount="5"
+            android:orientation="vertical"
+            android:rowCount="4"
+            android:showDividers="middle" >
+
+            <ImageView
+                android:id="@+id/imageViewProfile"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_column="0"
+                android:layout_row="0"
+                android:background="@drawable/profile"
+                android:baselineAlignBottom="false"
+                android:contentDescription="@string/todo"
+                android:src="@drawable/profile"
+                android:tag="Profile"
+                android:textAlignment="center" />
+
+			<TextView
+			    android:id="@+id/textViewPerfil"
+			    android:layout_width="wrap_content"
+			    android:layout_height="wrap_content"
+			    android:layout_column="0"
+			    android:layout_margin="1dp"
+			    android:layout_row="1"
+			    android:gravity="center"
+			    android:text="@string/Perfil"
+			    android:textColor="#000000" />
+
+            <ImageView
+                android:id="@+id/imageViewCircuitos"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_column="1"
+                android:layout_row="0"
+                android:contentDescription="@string/todo"
+                android:src="@drawable/circuitos"
+                android:tag="Rutas" />
+
+            <TextView
+                android:id="@+id/textViewCircuitos"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_column="1"
+                android:layout_margin="1dp"
+                android:layout_row="1"
+                android:gravity="center"
+                android:text="@string/Circuitos"
+                android:textColor="#000000" />
+
+            <ImageView
+                android:id="@+id/imageViewConfiguracion"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_column="2"
+                android:layout_row="0"
+                android:contentDescription="@string/todo"
+                android:src="@drawable/configuracion" />
+
+            <TextView
+                android:id="@+id/textViewConfiguracion"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_column="2"
+                android:layout_margin="1dp"
+                android:layout_row="1"
+                android:gravity="center"
+                android:text="@string/Configuracion"
+                android:textColor="#000000" />
+			<ImageView
+                 android:id="@+id/imageViewEstaciones"
+                 android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_column="3"
+                android:layout_row="0"
+                android:contentDescription="@string/todo"
+                 android:src="@drawable/estaciones" />
+
+			 <TextView
+			     android:id="@+id/textViewEstaciones"
+			     android:layout_width="wrap_content"
+			     android:layout_height="wrap_content"
+			     android:layout_column="3"
+			     android:layout_margin="1dp"
+			     android:layout_row="1"
+			     android:gravity="center"
+			     android:text="@string/Estaciones"
+			     android:textColor="#000000" />
+
+			 <ImageView
+                 android:id="@+id/imageViewFacebook"
+                 android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_column="4"
+                android:layout_row="0"
+                android:contentDescription="@string/todo"
+                 android:src="@drawable/facebook" />
+
+			 <TextView
+			     android:id="@+id/textViewFacebook"
+			     android:layout_width="wrap_content"
+			     android:layout_height="wrap_content"
+			     android:layout_column="4"
+			     android:layout_margin="1dp"
+			     android:layout_row="1"
+			     android:gravity="center"
+			     android:text="@string/Facebook"
+			     android:textColor="#000000" />
+
+            <ImageView
+                android:id="@+id/imageViewRutas"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_column="0"
+                android:layout_row="2"
+                android:contentDescription="@string/todo"
+                android:src="@drawable/rutas" />
+
+            <TextView
+                android:id="@+id/textViewRutas"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_column="0"
+                android:layout_margin="1dp"
+                android:layout_row="3"
+                android:gravity="center"
+                android:text="@string/Rutas"
+                android:textColor="#000000" />
+
+            <ImageView
+                android:id="@+id/imageViewContactos"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_column="1"
+                android:layout_row="2"
+                android:contentDescription="@string/todo"
+                android:src="@drawable/contactos" />
+
+            <TextView
+                android:id="@+id/textViewContactos"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_column="1"
+                android:layout_margin="1dp"
+                android:layout_row="3"
+                android:gravity="center"
+                android:text="@string/Contactos"
+                android:textColor="#000000" />
+
+            <ImageView
+                android:id="@+id/imageViewComprar"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_column="2"
+                android:layout_row="2"
+                android:contentDescription="@string/todo"
+                android:src="@drawable/dolar" />
+
+             <TextView
+                 android:id="@+id/textViewComprar"
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:layout_column="2"
+                 android:layout_margin="1dp"
+                 android:layout_row="3"
+                 android:gravity="center"
+                 android:text="@string/Comprar"
+                 android:textColor="#000000" />
+
+             <ImageView
+                 android:id="@+id/imageViewtalleres"
+                 android:layout_width="45dp"
+                 android:layout_height="45dp"
+                 android:layout_column="3"
+                 android:layout_row="2"
+                 android:contentDescription="@string/todo"
+                 android:src="@drawable/talleres" />
+
+             <TextView
+                 android:id="@+id/textViewTalleres"
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:layout_column="3"
+                 android:layout_margin="1dp"
+                 android:layout_row="3"
+                 android:gravity="center"
+                 android:text="@string/Talleres"
+                 android:textColor="#000000" />
+
+        </GridLayout>
+    </SlidingDrawer>
+</RelativeLayout>
