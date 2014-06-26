@@ -18,6 +18,10 @@ INSTALACIÓN
 			*) Google play services
 		Instalen los paquetes seleccionados tocando el botón de abajo a la derecha.
 		(Va a llevar un poco de tiempo esto)
+	5) Descarguen facebook sdk como dice en el punto 3 de este enlace:
+		https://developers.facebook.com/docs/android/getting-started/
+	6) Una vez descargado, descompriman en algún lugar de su máquina.
+		
 	
 OBTENER CÓDIGO DEL TP	
 ---------------------
@@ -65,6 +69,26 @@ OBTENER CÓDIGO DEL TP
 			tilde verde google_play_services. Si no está, tocan el botón add y lo
 			eligen. Le dan ok y van a ver en este punto que el proyecto no tiene
 			ningún error.
+	Traigo facebook sdk:
+		*) Para prevenir un error sobre diferentes versiones de android-support-v4.jar
+			vayan al lugar donde descomprimieron facebookSDK y reemplacen el
+			archivo: facebook-andorid-sdk-3.15.0/libs/android-support-v4.jar
+			por el archivo CityBike/libs/android-support-v4.jar
+			(reemplacen el que está en facebook por el que tenemos en CityBike).
+		*) File->import
+		*) En root directory tocan el botón Browse y se van a la carpeta donde
+			descomprimieron facebook SDK (en el paso 5 de instalación (arriba)).
+			Van a la carpeta facebook-andorid-sdk-3.15.0/facebook y tocan 
+			aceptar. Cuando vuelvan, tocan Finish y esperan unos segundos a que 
+			eclipse cargue y buildee el wrokspace. Cuando termine les va a aparecer 
+			el proyecto que importaron.
+		*) click con el derecho sobre el proyecto CityBike, properties.
+		*) En android, controlen que en el sector de Library aparesca con un 
+			tilde verde FacebookSDK. Si no está, tocan el botón add y lo
+			eligen. Le dan ok y van a ver en este punto que el proyecto no tiene
+			incluido a android-support-v7-appcompat, FacebookSDK y google-play-services-lib
+			sin ningún error.
+	
 REPOSITORIO
 -----------		
 A partir de este momento pueden  usar el plugin svn de eclipse si 
