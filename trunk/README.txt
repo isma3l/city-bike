@@ -1,4 +1,4 @@
-
+﻿
 INSTALACIÓN
 ------------
 *) Para un ide eclipse existente:
@@ -72,7 +72,7 @@ OBTENER CÓDIGO DEL TP
 	Traigo facebook sdk:
 		*) Para prevenir un error sobre diferentes versiones de android-support-v4.jar
 			vayan al lugar donde descomprimieron facebookSDK y reemplacen el
-			archivo: facebook-andorid-sdk-3.15.0/libs/android-support-v4.jar
+			archivo: facebook-andorid-sdk-3.15.0/facebook/libs/android-support-v4.jar
 			por el archivo CityBike/libs/android-support-v4.jar
 			(reemplacen el que está en facebook por el que tenemos en CityBike).
 		*) File->import
