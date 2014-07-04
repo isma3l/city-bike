@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="#FF0000"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Este fragment aparece por defecto 
+        al iniciar la app o al rotar la pantalla(falta arreglar),
+        quizas aqui se podria poner algo de publicidad, 
+        ya que despues de elegir una opcion del menu, este fragment no se ve mas, (aunque se podria hacer que aparezca si es necesario)"        
+        
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textSize="20dp" />
+
+</LinearLayout>
