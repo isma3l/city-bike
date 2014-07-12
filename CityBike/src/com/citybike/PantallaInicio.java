@@ -1,116 +1,205 @@
 package com.citybike;
 
 
-import com.citybike.listaMenuDesplegable.Lista_Adaptador;
-import com.citybike.listaMenuDesplegable.ValoresMenu;
+import com.citybike.utils.Definitions;
+import com.citybike.utils.LogWrapper;
+import android.annotation.SuppressLint;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
+import android.widget.SimpleAdapter;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
-
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class PantallaInicio extends ActionBarActivity {
     private DrawerLayout drawerLayout;
     private ListView drawerList;
     private String tituloFragmentSeleccionado;
-    private DrawerToggle drawerToggle;    
-    private int posicionActual = -1;
-    
+    private DrawerToggle drawerToggle; 
+    private List<Map<String, Object>> optionList;
+    private Map<Integer,Fragment> fragmentMap;
+    private FragmentFactory fragmentFactory;  
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {		
+	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-        setContentView(R.layout.layout_pantalla_inicio);
-               
-        // se asigna por defecto en la pantalla principal el fragment base
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction().add(R.id.content_frame, new FragmentBase()).commit();     
-		
-        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawerToggle = new DrawerToggle(this, drawerLayout);
-        drawerList = (ListView) findViewById(R.id.left_drawer);
- 
-        drawerList.setAdapter(new Lista_Adaptador(getSupportActionBar().getThemedContext(),
-        		R.layout.layout_entrada_menu, ValoresMenu.itemsMenu));
-        
-        
-        drawerList.setOnItemClickListener(new OnItemClickListener() {        	
-            @Override
-            public void onItemClick(AdapterView parent, View view,
-                    int position, long id) {        
-                Fragment fragment = null;
-                
-              
-                /*
-                 * esta linea se usa cuando se selecciona el mismo item(fragment) que se esta mostrando,
-                 * ya que es innecesario destruirlo y crearlo nuevamente si se quiere ver lo mismo
-                 * 
-                 * aunque la razon principal es que al seleccionar dos veces el mapa o circuito
-                 * ocurre un error porque se trata de crear nuevamente un mapa,o circuito,
-                 * con su mismo id sin haber eliminado el mapa anterior, no lo entiendo del todo, 
-                 * pero por esa razon es que en los fragment del mapa y del  circuito se sobreescribe el 
-                 * metodo ondestroy  para asegurarse qe se borren los mapas que contienen. 
-                 * 
-                 */
-                if(posicionActual == position)
-                	return;
-                
-                posicionActual = position;
-                
-                /*
-                 * al seleccionar un item del menu se crea un nuevo fragment
-                 * con lo cual deberia guardarse el estado de cada uno al cerrarse 
-                 * o se podria tener una lista de todos fragments,
-                 * 
-                 */
-                switch (position) {                	
-                    case 0:
-                        fragment = new FragmentPerfil();
-                        break;
-                    case 1:
-                        fragment = new FragmentContactos();
-                        break;
-                    case 2:                                    	 
-                    	fragment = new FragmentMapa();                  
-                    	break; 
-                    case 3:
-                    	fragment = new FragmentEventos();
-                    	break;    
-                    case 4:
-                    	fragment = new FragmentCircuitos();
-                    	break;
-                    case 5:
-                    	fragment = new FragmentPremium();
-                    	break;
-                }
-          
-                FragmentManager fragmentManager = getSupportFragmentManager();     
-                fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
-                
-                drawerList.setItemChecked(position, true);
-     
-                tituloFragmentSeleccionado = ValoresMenu.getTitlePosicion(position);
-                getSupportActionBar().setTitle(ValoresMenu.getTitlePosicion(position));
-     
-                drawerLayout.closeDrawer(drawerList);
-            }		
-        });
-        
-	
-        drawerLayout.setDrawerListener(drawerToggle);
-        
+		LogWrapper.d(Definitions.mainLogTag,
+					"onCreate()... Comienzo del ciclo de vida de la actividad");
+        setContentView(R.layout.layout_pantalla_inicio); 
+        LogWrapper.d(Definitions.mainLogTag,
+        			"setContentView(layout_pantalla_inicio)... OK");
+        addInitialFragment();   
+		createApplicationMainOptions();       
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
+	}	
+	private void addInitialFragment() {
+		LogWrapper.d(Definitions.mainLogTag,"addInitialFragment()");
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        LogWrapper.d(Definitions.mainLogTag,"getSupportFragmentManager ... OK");
+        FragmentTransaction fragmentTransaction=
+        									fragmentManager.beginTransaction();
+        LogWrapper.d(Definitions.mainLogTag,"FragmentTransaction ...OK");
+        fragmentTransaction.add(R.id.content_frame, new FragmentBase());
+        LogWrapper.d(Definitions.mainLogTag,
+        			"fragmentTransaction.add(R.id.content_frame, "
+        			+ "new FragmentBase()) ... OK");
+        fragmentTransaction.commit();  
+        LogWrapper.d(Definitions.mainLogTag,
+        			"fragmentTransaction.commit()... OK");
+        LogWrapper.d(Definitions.mainLogTag,
+        			"Se asignó por defecto en la pantalla principal el fragment"
+        			+ " base");	
 	}
-	
-	
+	private void createApplicationMainOptions() {
+		LogWrapper.d(Definitions.mainLogTag,"createApplicationMainOptions()");
+		assignDrawerToggleToDrawerLayout();
+        createNavigationOptions();
+	}
+	private void assignDrawerToggleToDrawerLayout() {
+		LogWrapper.d(Definitions.mainLogTag,
+					"assignDrawerToggleToDrawerLayout()");
+		drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+		LogWrapper.d(Definitions.mainLogTag,
+					"findViewById(R.id.drawer_layout)... OK");
+        drawerToggle = new DrawerToggle(this, drawerLayout);
+        LogWrapper.d(Definitions.mainLogTag,"DrawerToggle created ... OK");
+        drawerLayout.setDrawerListener(drawerToggle);
+        LogWrapper.d(Definitions.mainLogTag,
+        			"Drawer toggle será notificado sobre los eventos que "
+        			+ "ocurran en drawer layout");	
+	}
+
+
+	@SuppressLint("UseSparseArrays")
+	private void createNavigationOptions() {
+		LogWrapper.d(Definitions.mainLogTag,
+					"createNavigationOptions()");
+		drawerList = (ListView) findViewById(R.id.left_drawer);
+        LogWrapper.d(Definitions.mainLogTag,
+        			"Listview 'drawerList' created with  findViewById(R.id."
+        			+ "left_drawer)... OK");
+        optionList=new ArrayList<Map<String,Object>>();
+        fragmentMap=new HashMap<Integer,Fragment>();
+		LogWrapper.d(Definitions.FragListLogTag,"fragmentMap creado");
+		fragmentFactory= new NavigationFragmentFactory();
+		LogWrapper.d(Definitions.FragListLogTag,"fragmentFactory creada");
+        addItemsToOptionList();
+        setAdapterToDrawerList(drawerList);
+        drawerList.setOnItemClickListener(new NavigationListener(this));
+        LogWrapper.d(Definitions.mainLogTag,
+        			"Cuando se toca un item en drawerList se invoca a "
+        			+ "NavigationItemClickListener (a su método onItemClick)");
+	}
+
+
+	private void setAdapterToDrawerList(ListView drawerList2){
+		LogWrapper.d(Definitions.mainLogTag,
+					"Le asigno el adaptador que listview necesita para mostrar"
+					+ " los items que tiene adentro");
+		 String[] columnNames= new String[]{Definitions.appIcon,
+				 							Definitions.appName};
+	     int[] columnValues=new int[]{R.id.appIcon,R.id.appName};
+	     SimpleAdapter simpleAdapter=new SimpleAdapter(this,
+	    				 						optionList,
+	    				 						R.layout.navigation_list_item,
+	    				 						columnNames,
+	    				 						columnValues);
+	     drawerList.setAdapter(simpleAdapter);
+	     LogWrapper.d(Definitions.mainLogTag,
+	    		 	"Adaptador asignado a drawerlist.. Ok");
+	}
+	private void addItemsToOptionList() {
+		LogWrapper.d(Definitions.mainLogTag,"addItemsToOptionList()");
+		addOption(Definitions.appIcon,
+					R.drawable.profile,
+					Definitions.appName,
+					Definitions.profile);	
+		LogWrapper.d(Definitions.mainLogTag,
+					"Se agregó la fila con el icono y el texto: "
+					+Definitions.profile);
+		addOption(Definitions.appIcon,
+					R.drawable.contactos,
+					Definitions.appName,
+					Definitions.contact);
+		LogWrapper.d(Definitions.mainLogTag,
+					"Se agregó la fila con el icono y el texto: "
+					+Definitions.contact);
+		addOption(Definitions.appIcon,
+					R.drawable.eventos,
+					Definitions.appName,
+					Definitions.event);
+		LogWrapper.d(Definitions.mainLogTag,
+					"Se agregó la fila con el icono y el texto: "
+					+Definitions.event);
+		addOption(Definitions.appIcon,
+					R.drawable.circuitos,
+					Definitions.appName,
+					Definitions.circuits);
+		LogWrapper.d(Definitions.mainLogTag,
+					"Se agregó la fila con el icono y el texto: "
+					+Definitions.circuits);
+		addOption(Definitions.appIcon,
+					R.drawable.dolar,
+					Definitions.appName,
+					Definitions.bePremium);		
+		LogWrapper.d(Definitions.mainLogTag,
+					"Se agregó la fila con el icono y el texto: "
+					+Definitions.bePremium);
+	}
+	private void addOption(String colIconApp,
+							Integer iconId,
+							String colNameApp,
+							String appLabel) {
+		LogWrapper.d(Definitions.mainLogTag,
+					"addOption (el mapa es un item (una opción formada por "
+					+ "icono + texto) de la lista de opciones)");
+		Map<String,Object> optionsMap = new HashMap<String,Object>();
+		LogWrapper.d(Definitions.mainLogTag,
+					"Agrego el icono con id: "+ iconId+" a la clave: "
+					+colIconApp+" del mapa");
+		optionsMap.put(colIconApp,iconId);
+		LogWrapper.d(Definitions.mainLogTag,
+					"Agrego el texto del item: "+ appLabel+" a la clave: "
+					+colNameApp+" del mapa");
+		optionsMap.put(colNameApp,appLabel);
+		LogWrapper.d(Definitions.mainLogTag,
+					"Agrego el mapa a la lista de opciones");
+		optionList.add(optionsMap);
+		Fragment fragment= fragmentFactory.create(appLabel);
+		logFragmentCreationResult(fragment);
+		Integer pos=optionList.size()-1;
+		LogWrapper.d(Definitions.mainLogTag,
+					"(pos,Fragment): ("+pos+","+appLabel+")");
+		fragmentMap.put(pos, fragment);
+	}
+	public Map<Integer, Fragment> getFragmentMap() {
+		return fragmentMap;
+	}
+	public List<Map<String, Object>> getOptionList() {
+		return optionList;
+	}
+	public DrawerLayout getDrawerLayout() {
+		return drawerLayout;
+	}
+
+
+	private void logFragmentCreationResult(Fragment fragment) {
+		if (fragment != null) 
+			LogWrapper.d(Definitions.mainLogTag,"Fragment creado!!");
+		else LogWrapper.e(Definitions.mainLogTag,"fragment e null!!");
+		
+	}
+
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// este metodo es usado  al seleccionar un icono del actionBar
@@ -148,8 +237,16 @@ public class PantallaInicio extends ActionBarActivity {
 	    return super.onPrepareOptionsMenu(menu);
 	}
 	
+	public void setTituloFragmentSeleccionado(String tituloFragmentSeleccionado) {
+		this.tituloFragmentSeleccionado = tituloFragmentSeleccionado;
+	}
 	public String getSectionTitle() {
 		return tituloFragmentSeleccionado;
+	}
+
+
+	public ListView getDrawerList() {
+		return drawerList;
 	}
 	
 	
