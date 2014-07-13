@@ -2,19 +2,112 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:background="#FF0000"
+    android:background="@drawable/citybikebackground2jpg"
     android:orientation="vertical" >
 
-    <TextView
-        android:id="@+id/textContact"
-        android:layout_width="wrap_content"
+    <ImageView
+        android:id="@+id/imageView1"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Este fragment aparece por defecto 
-        al iniciar la app o al rotar la pantalla(falta arreglar),
-        quizas aqui se podria poner algo de publicidad, 
-        ya que despues de elegir una opcion del menu, este fragment no se ve mas, (aunque se podria hacer que aparezca si es necesario)"        
-        
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textSize="20dp" />
+        android:scaleType="fitXY"
+        android:src="@drawable/citybike2" />
 
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:paddingTop="10dp" >
+
+		<RelativeLayout
+		    android:id="@+id/relativeUserName"
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content" >
+
+		    <TextView
+		        android:id="@+id/LabelUserName"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:layout_marginTop="5dp"
+		        android:contentDescription="user label"
+		        android:shadowColor="#8a6603"
+		        android:shadowDx="3"
+		        android:shadowDy="2"
+		        android:shadowRadius="1.8"
+		        android:text="Usuario "
+		        android:textAppearance="?android:attr/textAppearanceLarge"
+		        android:textColor="#ffff00"
+		        android:textSize="20sp"
+		        android:textStyle="bold" />
+
+		    <TextView
+		        android:id="@+id/LabelPassword"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:layout_below="@id/LabelUserName"
+		        android:layout_marginTop="5dp"
+		        android:contentDescription="user pass"
+		        android:shadowColor="#8a6603"
+		        android:shadowDx="3"
+		        android:shadowDy="2"
+		        android:shadowRadius="1.8"
+		        android:text="Password"
+		        android:textAppearance="?android:attr/textAppearanceLarge"
+		        android:textColor="#ffff00"
+		        android:textSize="20sp"
+		        android:textStyle="bold" />
+
+		</RelativeLayout>
+
+		<RelativeLayout
+		    android:id="@+id/relativeUserPass"
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:layout_toRightOf="@+id/relativeUserName"
+		    android:paddingRight="10dp" >
+
+			<EditText
+			    android:id="@+id/editTextUserName"
+			    android:layout_width="wrap_content"
+			    android:layout_height="wrap_content"
+			    android:layout_marginLeft="10dp"
+			    android:layout_marginTop="5dp"
+			    android:background="#d0d0d0"
+			    android:contentDescription="user entry"
+			    android:ems="10"
+			    android:inputType="textAutoComplete"
+			    android:textSize="20sp"
+			    android:visibility="visible" />
+
+		   <EditText
+		       android:id="@+id/editTextUserPass"
+		       android:layout_width="wrap_content"
+		       android:layout_height="wrap_content"
+		       android:layout_below="@id/editTextUserName"
+		       android:layout_marginLeft="10dp"
+		       android:layout_marginTop="5dp"
+		       android:background="#d0d0d0"
+		       android:contentDescription="password entry"
+		       android:ems="10"
+		       android:inputType="textPassword|textWebPassword|numberPassword"
+		       android:textSize="20sp"
+		       android:visibility="visible" />
+
+		</RelativeLayout>
+
+		<Button
+		    android:id="@+id/button1"
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:layout_alignLeft="@+id/relativeUserPass"
+		    android:layout_alignRight="@dimen/activity_vertical_margin"
+		    android:layout_below="@+id/relativeUserPass"
+		    android:layout_marginLeft="54dp"
+		    android:text="Login"
+		    android:textStyle="bold"
+		    android:shadowColor="#8a6603"
+	        android:shadowDx="3"
+	        android:shadowDy="2"
+	        android:shadowRadius="1.8"
+		    android:typeface="sans" />
+
+	</RelativeLayout>
 </LinearLayout>

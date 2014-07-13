@@ -48,7 +48,7 @@ public class PantallaInicio extends ActionBarActivity {
         FragmentTransaction fragmentTransaction=
         									fragmentManager.beginTransaction();
         LogWrapper.d(Definitions.mainLogTag,"FragmentTransaction ...OK");
-        fragmentTransaction.add(R.id.content_frame, new FragmentBase());
+        fragmentTransaction.add(R.id.content_frame, new FragmentMapa());
         LogWrapper.d(Definitions.mainLogTag,
         			"fragmentTransaction.add(R.id.content_frame, "
         			+ "new FragmentBase()) ... OK");
