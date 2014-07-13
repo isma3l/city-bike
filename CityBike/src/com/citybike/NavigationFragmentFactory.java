@@ -8,6 +8,8 @@ public class NavigationFragmentFactory implements FragmentFactory {
 
 	@Override
 	public Fragment create(String type) {
+		if (type.equals(Definitions.home))
+			return new FragmentMapa();
 		if (type.equals(Definitions.profile))
 			return new FragmentPerfil();
 		if (type.equals(Definitions.event))

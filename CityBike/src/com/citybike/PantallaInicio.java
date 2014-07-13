@@ -35,20 +35,19 @@ public class PantallaInicio extends ActionBarActivity {
 					"onCreate()... Comienzo del ciclo de vida de la actividad");
         setContentView(R.layout.layout_pantalla_inicio); 
         LogWrapper.d(Definitions.mainLogTag,
-        			"setContentView(layout_pantalla_inicio)... OK");
-        addInitialFragment();   
+        			"setContentView(layout_pantalla_inicio)... OK");   
 		createApplicationMainOptions();       
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
 	}	
-	private void addInitialFragment() {
+	private void addInitialFragment(Fragment fragment) {
 		LogWrapper.d(Definitions.mainLogTag,"addInitialFragment()");
         FragmentManager fragmentManager = getSupportFragmentManager();
         LogWrapper.d(Definitions.mainLogTag,"getSupportFragmentManager ... OK");
         FragmentTransaction fragmentTransaction=
         									fragmentManager.beginTransaction();
         LogWrapper.d(Definitions.mainLogTag,"FragmentTransaction ...OK");
-        fragmentTransaction.add(R.id.content_frame, new FragmentMapa());
+        fragmentTransaction.add(R.id.content_frame,fragment);
         LogWrapper.d(Definitions.mainLogTag,
         			"fragmentTransaction.add(R.id.content_frame, "
         			+ "new FragmentBase()) ... OK");
@@ -120,6 +119,13 @@ public class PantallaInicio extends ActionBarActivity {
 	private void addItemsToOptionList() {
 		LogWrapper.d(Definitions.mainLogTag,"addItemsToOptionList()");
 		addOption(Definitions.appIcon,
+				R.drawable.home,
+				Definitions.appName,
+				Definitions.home);	
+	LogWrapper.d(Definitions.mainLogTag,
+				"Se agregó la fila con el icono y el texto: "
+				+Definitions.profile);
+		addOption(Definitions.appIcon,
 					R.drawable.profile,
 					Definitions.appName,
 					Definitions.profile);	
@@ -180,6 +186,8 @@ public class PantallaInicio extends ActionBarActivity {
 		LogWrapper.d(Definitions.mainLogTag,
 					"(pos,Fragment): ("+pos+","+appLabel+")");
 		fragmentMap.put(pos, fragment);
+		if (appLabel.equals(Definitions.home))
+			addInitialFragment(fragment);
 	}
 	public Map<Integer, Fragment> getFragmentMap() {
 		return fragmentMap;

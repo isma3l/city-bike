@@ -10,4 +10,5 @@ public class Definitions {
     public static final String bePremium="Ser Premium";
     public static final String mainLogTag="PANTALLA INICIO.java";
     public static final String FragListLogTag="NavigationFagmentList";
+	public static final String home="Home";
 }
