@@ -11,4 +11,8 @@ public class Definitions {
     public static final String mainLogTag="PANTALLA INICIO.java";
     public static final String FragListLogTag="NavigationFagmentList";
 	public static final String home="Home";
+	public static final String loginLogTag="LOGINACTIVITY";
+	public static final String[] DUMMY_CREDENTIALS = new String[] {
+		"foo@example.com:hello", "bar@example.com:world" };
+	public static final String UserLoginTaskLogTag = "UserLoginTask";
 }
