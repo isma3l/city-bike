@@ -1,10 +1,14 @@
-package com.citybike;
+package com.citybike.pantallainicio.Fragments;
 
+import com.citybike.R;
+import com.citybike.R.id;
+import com.citybike.R.layout;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;

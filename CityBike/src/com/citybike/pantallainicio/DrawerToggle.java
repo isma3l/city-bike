@@ -1,4 +1,8 @@
-package com.citybike;
+package com.citybike.pantallainicio;
+
+import com.citybike.R;
+import com.citybike.R.drawable;
+import com.citybike.R.string;
 
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;

@@ -1,4 +1,4 @@
-package com.citybike;
+package com.citybike.utils;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;

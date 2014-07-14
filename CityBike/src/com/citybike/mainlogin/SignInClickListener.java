@@ -1,4 +1,6 @@
-package com.citybike;
+package com.citybike.mainlogin;
+
+import com.citybike.LoginActivity;
 
 import android.view.View;
 import android.view.View.OnClickListener;

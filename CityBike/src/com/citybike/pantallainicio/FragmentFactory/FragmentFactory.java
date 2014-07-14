@@ -1,4 +1,4 @@
-package com.citybike;
+package com.citybike.pantallainicio.FragmentFactory;
 
 import android.support.v4.app.Fragment;
 

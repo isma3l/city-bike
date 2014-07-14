@@ -1,7 +1,10 @@
-package com.citybike;
+package com.citybike.pantallainicio;
 
 import java.util.List;
 import java.util.Map;
+
+import com.citybike.R;
+import com.citybike.R.id;
 import com.citybike.utils.Definitions;
 import com.citybike.utils.LogWrapper;
 

@@ -1,4 +1,4 @@
-package com.citybike;
+package com.citybike.mainlogin;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.view.View;

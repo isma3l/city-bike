@@ -1,5 +1,11 @@
-package com.citybike;
+package com.citybike.pantallainicio.FragmentFactory;
 
+import com.citybike.pantallainicio.Fragments.FragmentCircuitos;
+import com.citybike.pantallainicio.Fragments.FragmentContactos;
+import com.citybike.pantallainicio.Fragments.FragmentEventos;
+import com.citybike.pantallainicio.Fragments.FragmentMapa;
+import com.citybike.pantallainicio.Fragments.FragmentPerfil;
+import com.citybike.pantallainicio.Fragments.FragmentPremium;
 import com.citybike.utils.Definitions;
 
 import android.support.v4.app.Fragment;

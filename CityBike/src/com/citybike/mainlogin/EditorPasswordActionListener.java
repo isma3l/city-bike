@@ -1,4 +1,8 @@
-package com.citybike;
+package com.citybike.mainlogin;
+
+import com.citybike.LoginActivity;
+import com.citybike.R;
+import com.citybike.R.id;
 
 import android.view.KeyEvent;
 import android.view.inputmethod.EditorInfo;
