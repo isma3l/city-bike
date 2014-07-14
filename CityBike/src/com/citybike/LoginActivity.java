@@ -1,44 +1,32 @@
 package com.citybike;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.CursorLoader;
-import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
-import android.view.KeyEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.inputmethod.EditorInfo;
+import android.view.ViewPropertyAnimator;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import com.citybike.utils.Definitions;
+import com.citybike.utils.LogWrapper;
 
 /**
  * A login screen that offers login via email/password.
  */
-public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
-
-	/**
-	 * A dummy authentication store containing known user names and passwords.
-	 * TODO: remove after connecting to a real authentication system.
-	 */
-	private static final String[] DUMMY_CREDENTIALS = new String[] {
-			"foo@example.com:hello", "bar@example.com:world" };
+public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {	
 	/**
 	 * Keep track of the login task to ensure we can cancel it if requested.
 	 */
@@ -53,91 +41,116 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		LogWrapper.d(Definitions.loginLogTag,"onCreate()");
 		setContentView(R.layout.activity_login);
-		// Set up the login form.
+		LogWrapper.d(Definitions.loginLogTag,"Set up the login form.");
 		mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
 		populateAutoComplete();
-
 		mPasswordView = (EditText) findViewById(R.id.password);
+		LogWrapper.d(Definitions.loginLogTag,"set actionlistener to passview");
 		mPasswordView
-				.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-					@Override
-					public boolean onEditorAction(TextView textView, int id,
-							KeyEvent keyEvent) {
-						if (id == R.id.login || id == EditorInfo.IME_NULL) {
-							attemptLogin();
-							return true;
-						}
-						return false;
-					}
-				});
-
-		Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
-		mEmailSignInButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				attemptLogin();
-			}
-		});
-
+			.setOnEditorActionListener(new EditorPasswordActionListener(this));
+		Button mEmailSignInButton = 
+			(Button) findViewById(R.id.email_sign_in_button);
+		LogWrapper.d(Definitions.loginLogTag,
+				"set cliklistener to SignIn button");
+		mEmailSignInButton.setOnClickListener(new SignInClickListener(this));
 		mLoginFormView = findViewById(R.id.login_form);
 		mProgressView = findViewById(R.id.login_progress);
 	}
 
 	private void populateAutoComplete() {
+		LogWrapper.d(Definitions.loginLogTag,"Servicio  de autocompletado");
 		getLoaderManager().initLoader(0, null, this);
 	}
-
-	/**
-	 * Attempts to sign in or register the account specified by the login form.
-	 * If there are form errors (invalid email, missing fields, etc.), the
-	 * errors are presented and no actual login attempt is made.
-	 */
 	public void attemptLogin() {
-		if (mAuthTask != null) {
-			return;
+		LogWrapper.i(Definitions.loginLogTag,
+					"Attempts to sign in or register the account specified by "
+					+ "the login form.");
+		LogWrapper.i(Definitions.loginLogTag,"If there are form errors (invalid"
+				+ " email, missing fields, etc.), the errors are presented and "
+				+ "no actual login attempt is made.");
+		if (noCurrentBackgroundTaskPerformingUserLoginAttempt()){
+			LogWrapper.d(Definitions.loginLogTag,"Reset errors.");
+			mEmailView.setError(null);
+			mPasswordView.setError(null);
+			LogWrapper.d(Definitions.loginLogTag,
+						"Store values at the time of the login attempt.");
+			String email = mEmailView.getText().toString();
+			String password = mPasswordView.getText().toString();
+			View focusView = getFocusView(email,password);
+			focusToViewWithErrorOrStartBackground(focusView,email,password);
 		}
+	}
 
-		// Reset errors.
-		mEmailView.setError(null);
-		mPasswordView.setError(null);
+	private void focusToViewWithErrorOrStartBackground(View focusView,
+			String email, String password) {
+		if (errorInLogIn(focusView))
+			focusToViewWereErrorWasProduced(focusView);
+		else 
+			startBackgroundTaskToPerformLogInAttempt(email,password);
+		
+	}
 
-		// Store values at the time of the login attempt.
-		String email = mEmailView.getText().toString();
-		String password = mPasswordView.getText().toString();
+	private void startBackgroundTaskToPerformLogInAttempt(String email,
+			String password) {
+		LogWrapper.d(Definitions.loginLogTag,
+					"Show a progress spinner, and kick off a background task to"
+					+ " perform the user login attempt.");
+		showProgress(true);
+		mAuthTask = new UserLoginTask(email, password,this);
+		LogWrapper.d(Definitions.loginLogTag,"Start background task");
+		mAuthTask.execute((Void) null);
+		
+	}
 
-		boolean cancel = false;
-		View focusView = null;
+	public void setmAuthTask(UserLoginTask mAuthTask) {
+		this.mAuthTask = mAuthTask;
+	}
 
-		// Check for a valid password, if the user entered one.
-		if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
-			mPasswordView.setError(getString(R.string.error_invalid_password));
-			focusView = mPasswordView;
-			cancel = true;
-		}
+	private void focusToViewWereErrorWasProduced(View focusView) {
+		LogWrapper.d(Definitions.loginLogTag,
+				"There was an error; don't attempt login and focus "
+				+ "the first form field with an error.");
+	focusView.requestFocus();
+		
+	}
 
-		// Check for a valid email address.
-		if (TextUtils.isEmpty(email)) {
+	private boolean errorInLogIn(View focusView) {
+		return (focusView!=null);
+	}
+
+	private View getFocusView(String email, String password) {
+		LogWrapper.d(Definitions.loginLogTag,
+					"Check for a valid email address.");
+		if (mailIsEmpty(email)) {
 			mEmailView.setError(getString(R.string.error_field_required));
-			focusView = mEmailView;
-			cancel = true;
-		} else if (!isEmailValid(email)) {
+			return mEmailView;
+		}
+		if (mailExistsAndIsInvalid(email)) {
 			mEmailView.setError(getString(R.string.error_invalid_email));
-			focusView = mEmailView;
-			cancel = true;
+			return mEmailView;
 		}
+		LogWrapper.d(Definitions.loginLogTag,
+				"Check for a valid password, if the user entered one.");
+		if (passwordExistsAndIsInvalid(password)){
+			mPasswordView.setError(getString(R.string.error_invalid_password));
+			return mPasswordView;
+		}
+		return null;
+	}
+	private boolean mailIsEmpty(String email){
+		return TextUtils.isEmpty(email);
+	}
+	private boolean mailExistsAndIsInvalid(String email){
+		return ((!TextUtils.isEmpty(email))&&((!isEmailValid(email))));
+	}
+	private boolean passwordExistsAndIsInvalid(String password) {
+		return (!TextUtils.isEmpty(password) && !isPasswordValid(password));
+	}
 
-		if (cancel) {
-			// There was an error; don't attempt login and focus the first
-			// form field with an error.
-			focusView.requestFocus();
-		} else {
-			// Show a progress spinner, and kick off a background task to
-			// perform the user login attempt.
-			showProgress(true);
-			mAuthTask = new UserLoginTask(email, password);
-			mAuthTask.execute((Void) null);
-		}
+	private boolean noCurrentBackgroundTaskPerformingUserLoginAttempt() {
+		return (mAuthTask == null);
 	}
 
 	private boolean isEmailValid(String email) {
@@ -150,62 +163,69 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
 		return password.length() > 4;
 	}
 
-	/**
-	 * Shows the progress UI and hides the login form.
-	 */
 	@TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
 	public void showProgress(final boolean show) {
-		// On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
-		// for very easy animations. If available, use these APIs to fade-in
-		// the progress spinner.
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
-			int shortAnimTime = getResources().getInteger(
-					android.R.integer.config_shortAnimTime);
+		LogWrapper.i(Definitions.loginLogTag,
+				"Shows the progress UI and hides the login form.");
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2)
+			useHoneyCombMr2ViewPropertyAnimatorApiToFadeInProgressSpinner(show);
+		else
+			showAndHideRelevantUiComponents(show);
+	}
 
-			mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-			mLoginFormView.animate().setDuration(shortAnimTime)
-					.alpha(show ? 0 : 1)
-					.setListener(new AnimatorListenerAdapter() {
-						@Override
-						public void onAnimationEnd(Animator animation) {
-							mLoginFormView.setVisibility(show ? View.GONE
-									: View.VISIBLE);
-						}
-					});
+	public EditText getmPasswordView() {
+		return mPasswordView;
+	}
 
-			mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-			mProgressView.animate().setDuration(shortAnimTime)
-					.alpha(show ? 1 : 0)
-					.setListener(new AnimatorListenerAdapter() {
-						@Override
-						public void onAnimationEnd(Animator animation) {
-							mProgressView.setVisibility(show ? View.VISIBLE
-									: View.GONE);
-						}
-					});
-		} else {
-			// The ViewPropertyAnimator APIs are not available, so simply show
-			// and hide the relevant UI components.
-			mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-			mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-		}
+	private void showAndHideRelevantUiComponents(final boolean show) {
+		mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+		mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+	}
+
+	private void useHoneyCombMr2ViewPropertyAnimatorApiToFadeInProgressSpinner(
+													final boolean show) {
+		int shortAnimTime = getResources().getInteger(
+				android.R.integer.config_shortAnimTime);
+		LogWrapper.d(Definitions.loginLogTag,"use HoneyCombMr2 api's");
+		setViewProperties(true,mLoginFormView,show,shortAnimTime);
+		setViewProperties(false,mProgressView,show,shortAnimTime);
+		mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+	}
+
+	private void setViewProperties(boolean isLogInView,
+									View view,
+									final boolean show,
+									int shortAnimTime) {
+		view.setVisibility(show ? View.GONE : View.VISIBLE);
+		ViewPropertyAnimator viewPropertyAnimator=view.animate();
+		viewPropertyAnimator.setDuration(shortAnimTime);
+		viewPropertyAnimator.alpha( isLogInView ?(show ? 0 : 1):(show ? 0 : 1));
+		ViewAnimatorListenerAdapter viewAnimatorListenerAdapter=
+									new ViewAnimatorListenerAdapter(view,show);
+		viewPropertyAnimator.setListener(viewAnimatorListenerAdapter);
 	}
 
 	@Override
 	public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-		return new CursorLoader(this,
-				// Retrieve data rows for the device user's 'profile' contact.
+		Uri uriRetrieveDataRowsForTheDeviceUsersProfileContact=
 				Uri.withAppendedPath(ContactsContract.Profile.CONTENT_URI,
-						ContactsContract.Contacts.Data.CONTENT_DIRECTORY),
-				ProfileQuery.PROJECTION,
-
-				// Select only email addresses.
-				ContactsContract.Contacts.Data.MIMETYPE + " = ?",
-				new String[] { ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE },
-
-				// Show primary email addresses first. Note that there won't be
-				// a primary email address if the user hasn't specified one.
-				ContactsContract.Contacts.Data.IS_PRIMARY + " DESC");
+				ContactsContract.Contacts.Data.CONTENT_DIRECTORY);
+		String[] projection=ProfileQuery.PROJECTION;
+		String onlyEmailAddressSelection=
+				ContactsContract.Contacts.Data.MIMETYPE + " = ?";
+		String[] selectionArgs=
+				new String[] {
+				ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE };
+		String orderPrimaryEmailAddressFirst=
+				ContactsContract.Contacts.Data.IS_PRIMARY + " DESC";
+		CursorLoader loaderQueriesContentResolverReturnCursor=
+				new CursorLoader(this,
+						uriRetrieveDataRowsForTheDeviceUsersProfileContact,
+						projection,
+						onlyEmailAddressSelection,
+						selectionArgs,
+						orderPrimaryEmailAddressFirst);
+		return loaderQueriesContentResolverReturnCursor;
 	}
 
 	@Override
@@ -216,7 +236,6 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
 			emails.add(cursor.getString(ProfileQuery.ADDRESS));
 			cursor.moveToNext();
 		}
-
 		addEmailsToAutoComplete(emails);
 	}
 
@@ -234,73 +253,10 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
 	}
 
 	private void addEmailsToAutoComplete(List<String> emailAddressCollection) {
-		// Create adapter to tell the AutoCompleteTextView what to show in its
-		// dropdown list.
-		ArrayAdapter<String> adapter = new ArrayAdapter<String>(
-				LoginActivity.this,
+		ArrayAdapter<String> adapterAutoCompleteTextViewShowInDropdownList = 
+				new ArrayAdapter<String>(LoginActivity.this,
 				android.R.layout.simple_dropdown_item_1line,
 				emailAddressCollection);
-
-		mEmailView.setAdapter(adapter);
-	}
-
-	/**
-	 * Represents an asynchronous login/registration task used to authenticate
-	 * the user.
-	 */
-	public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
-
-		private final String mEmail;
-		private final String mPassword;
-
-		UserLoginTask(String email, String password) {
-			mEmail = email;
-			mPassword = password;
-		}
-
-		@Override
-		protected Boolean doInBackground(Void... params) {
-			// TODO: attempt authentication against a network service.
-
-			try {
-				// Simulate network access.
-				Thread.sleep(2000);
-			} catch (InterruptedException e) {
-				return false;
-			}
-
-			for (String credential : DUMMY_CREDENTIALS) {
-				String[] pieces = credential.split(":");
-				if (pieces[0].equals(mEmail)) {
-					// Account exists, return true if the password matches.
-					return pieces[1].equals(mPassword);
-				}
-			}
-
-			// TODO: register the new account here.
-			return true;
-		}
-
-		@Override
-		protected void onPostExecute(final Boolean success) {
-			mAuthTask = null;
-			showProgress(false);
-
-			if (success) {
-				Intent intent= new Intent(LoginActivity.this,PantallaInicio.class);
-				startActivity(intent);
-				//finish();
-			} else {
-				mPasswordView
-						.setError(getString(R.string.error_incorrect_password));
-				mPasswordView.requestFocus();
-			}
-		}
-
-		@Override
-		protected void onCancelled() {
-			mAuthTask = null;
-			showProgress(false);
-		}
+		mEmailView.setAdapter(adapterAutoCompleteTextViewShowInDropdownList);
 	}
 }
