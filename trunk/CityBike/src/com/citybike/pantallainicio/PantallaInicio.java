@@ -1,8 +1,16 @@
-package com.citybike;
+package com.citybike.pantallainicio;
 
 
+import com.citybike.R;
+import com.citybike.R.drawable;
+import com.citybike.R.id;
+import com.citybike.R.layout;
+import com.citybike.R.menu;
+import com.citybike.pantallainicio.FragmentFactory.FragmentFactory;
+import com.citybike.pantallainicio.FragmentFactory.NavigationFragmentFactory;
 import com.citybike.utils.Definitions;
 import com.citybike.utils.LogWrapper;
+
 import android.annotation.SuppressLint;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -15,6 +23,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

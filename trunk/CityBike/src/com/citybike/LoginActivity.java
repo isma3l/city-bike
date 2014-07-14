@@ -17,9 +17,18 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+
 import java.util.ArrayList;
 import java.util.List;
 
+import com.citybike.R;
+import com.citybike.R.id;
+import com.citybike.R.layout;
+import com.citybike.R.string;
+import com.citybike.mainlogin.EditorPasswordActionListener;
+import com.citybike.mainlogin.SignInClickListener;
+import com.citybike.mainlogin.UserLoginTask;
+import com.citybike.mainlogin.ViewAnimatorListenerAdapter;
 import com.citybike.utils.Definitions;
 import com.citybike.utils.LogWrapper;
 

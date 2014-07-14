@@ -1,5 +1,9 @@
-package com.citybike;
+package com.citybike.mainlogin;
 
+import com.citybike.LoginActivity;
+import com.citybike.R;
+import com.citybike.R.string;
+import com.citybike.pantallainicio.PantallaInicio;
 import com.citybike.utils.Definitions;
 import com.citybike.utils.LogWrapper;
 
@@ -17,7 +21,9 @@ public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
 	private final String mPassword;
 	private LoginActivity loginActivity;
 
-	UserLoginTask(String email, String password, LoginActivity loginActivity) {
+	public UserLoginTask(String email, 
+						String password,
+						LoginActivity loginActivity) {
 		mEmail = email;
 		mPassword = password;
 		this.loginActivity=loginActivity;

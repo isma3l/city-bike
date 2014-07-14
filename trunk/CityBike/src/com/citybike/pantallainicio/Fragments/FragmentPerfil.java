@@ -1,4 +1,7 @@
-package com.citybike;
+package com.citybike.pantallainicio.Fragments;
+
+import com.citybike.R;
+import com.citybike.R.layout;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
