@@ -1,20 +1,20 @@
 package com.citybike.mainlogin;
 
-import com.citybike.LoginActivity;
+import com.citybike.MainActivity;
 
 import android.view.View;
 import android.view.View.OnClickListener;
 
 public class SignInClickListener implements OnClickListener {
-	private LoginActivity loginActivity;
+	private MainActivity mainActivity;
 	
-	public SignInClickListener(LoginActivity loginActivity) {
-		this.loginActivity = loginActivity;
+	public SignInClickListener(MainActivity mainActivity) {
+		this.mainActivity= mainActivity;
 	}
 
 	@Override
 	public void onClick(View v) {
-		loginActivity.attemptLogin();
+		mainActivity.attemptLogin();
 	}
 
 }
