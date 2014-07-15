@@ -1,6 +1,6 @@
 package com.citybike.mainlogin;
 
-import com.citybike.LoginActivity;
+import com.citybike.MainActivity;
 import com.citybike.R;
 import com.citybike.R.string;
 import com.citybike.pantallainicio.PantallaInicio;
@@ -19,14 +19,14 @@ public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
 
 	private final String mEmail;
 	private final String mPassword;
-	private LoginActivity loginActivity;
+	private MainActivity mainActivity;
 
 	public UserLoginTask(String email, 
 						String password,
-						LoginActivity loginActivity) {
+						MainActivity mainActivity) {
 		mEmail = email;
 		mPassword = password;
-		this.loginActivity=loginActivity;
+		this.mainActivity=mainActivity;
 	}
 
 	@Override
@@ -64,8 +64,8 @@ public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
 
 	@Override
 	protected void onPostExecute(final Boolean success) {
-		loginActivity.setmAuthTask(null);
-		loginActivity.showProgress(false);
+		mainActivity.setmAuthTask(null);
+		mainActivity.showProgress(false);
 		if (success)
 			startActivityPantallaInicio();
 		else
@@ -76,8 +76,8 @@ public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
 		LogWrapper.d(Definitions.UserLoginTaskLogTag,
 				"advice wrongPassword");
 		String wrongPassword=
-				loginActivity.getString(R.string.error_incorrect_password);
-		EditText mPasswordView=loginActivity.getmPasswordView();
+				mainActivity.getString(R.string.error_incorrect_password);
+		EditText mPasswordView=mainActivity.getmPasswordView();
 		mPasswordView.setError(wrongPassword);
 		mPasswordView.requestFocus();	
 	}
@@ -85,14 +85,14 @@ public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
 	private void startActivityPantallaInicio() {
 		LogWrapper.d(Definitions.UserLoginTaskLogTag,
 				"start activity pantalla inicio");
-		Intent intent= new Intent(loginActivity,PantallaInicio.class);
-		loginActivity.startActivity(intent);
+		Intent intent= new Intent(mainActivity,PantallaInicio.class);
+		mainActivity.startActivity(intent);
 	}
 
 	@Override
 	protected void onCancelled() {
 		LogWrapper.d(Definitions.UserLoginTaskLogTag,"onCancelled().");
-		loginActivity.setmAuthTask(null);
-		loginActivity.showProgress(false);
+		mainActivity.setmAuthTask(null);
+		mainActivity.showProgress(false);
 	}
 }

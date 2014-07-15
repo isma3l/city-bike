@@ -10,7 +10,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.citybike.LoginActivity" >
+    tools:context="com.citybike.mainlogin.LoginActivity" >
 
     <!-- Login progress -->
     <ProgressBar
@@ -61,6 +61,13 @@
                 android:layout_marginTop="16dp"
                 android:text="@string/action_sign_in"
                 android:textStyle="bold" />
+            <com.facebook.widget.LoginButton
+		        android:id="@+id/authButton"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:layout_gravity="center_horizontal"
+		        android:layout_marginTop="30dp"
+		        />
         </LinearLayout>
     </ScrollView>
 

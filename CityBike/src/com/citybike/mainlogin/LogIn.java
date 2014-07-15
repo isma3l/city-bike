@@ -1,7 +1,16 @@
-package com.citybike;
+package com.citybike.mainlogin;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import com.citybike.MainActivity;
+import com.citybike.R;
+import com.citybike.R.id;
+import com.citybike.R.string;
+import com.citybike.utils.Definitions;
+import com.citybike.utils.LogWrapper;
 
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.CursorLoader;
 import android.content.Loader;
@@ -18,24 +27,8 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import com.citybike.R;
-import com.citybike.R.id;
-import com.citybike.R.layout;
-import com.citybike.R.string;
-import com.citybike.mainlogin.EditorPasswordActionListener;
-import com.citybike.mainlogin.SignInClickListener;
-import com.citybike.mainlogin.UserLoginTask;
-import com.citybike.mainlogin.ViewAnimatorListenerAdapter;
-import com.citybike.utils.Definitions;
-import com.citybike.utils.LogWrapper;
-
-/**
- * A login screen that offers login via email/password.
- */
-public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {	
+public class LogIn implements LoaderCallbacks<Cursor>{
+	private MainActivity mainActivity;
 	/**
 	 * Keep track of the login task to ensure we can cancel it if requested.
 	 */
@@ -46,31 +39,29 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
 	private EditText mPasswordView;
 	private View mProgressView;
 	private View mLoginFormView;
-
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		LogWrapper.d(Definitions.loginLogTag,"onCreate()");
-		setContentView(R.layout.activity_login);
+	public LogIn(MainActivity mainActivity){
+		this.mainActivity=mainActivity;
+	}
+	public void createForm(){
+		LogWrapper.d(Definitions.loginLogTag,"LogIn()");
 		LogWrapper.d(Definitions.loginLogTag,"Set up the login form.");
-		mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
+		mEmailView = (AutoCompleteTextView) mainActivity.findViewById(R.id.email);
 		populateAutoComplete();
-		mPasswordView = (EditText) findViewById(R.id.password);
+		mPasswordView = (EditText) mainActivity.findViewById(R.id.password);
 		LogWrapper.d(Definitions.loginLogTag,"set actionlistener to passview");
 		mPasswordView
-			.setOnEditorActionListener(new EditorPasswordActionListener(this));
+			.setOnEditorActionListener(new EditorPasswordActionListener(mainActivity));
 		Button mEmailSignInButton = 
-			(Button) findViewById(R.id.email_sign_in_button);
+			(Button) mainActivity.findViewById(R.id.email_sign_in_button);
 		LogWrapper.d(Definitions.loginLogTag,
 				"set cliklistener to SignIn button");
-		mEmailSignInButton.setOnClickListener(new SignInClickListener(this));
-		mLoginFormView = findViewById(R.id.login_form);
-		mProgressView = findViewById(R.id.login_progress);
+		mEmailSignInButton.setOnClickListener(new SignInClickListener(mainActivity));
+		mLoginFormView = mainActivity.findViewById(R.id.login_form);
+		mProgressView = mainActivity.findViewById(R.id.login_progress);	
 	}
-
 	private void populateAutoComplete() {
 		LogWrapper.d(Definitions.loginLogTag,"Servicio  de autocompletado");
-		getLoaderManager().initLoader(0, null, this);
+		mainActivity.getLoaderManager().initLoader(0, null,this);
 	}
 	public void attemptLogin() {
 		LogWrapper.i(Definitions.loginLogTag,
@@ -107,7 +98,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
 					"Show a progress spinner, and kick off a background task to"
 					+ " perform the user login attempt.");
 		showProgress(true);
-		mAuthTask = new UserLoginTask(email, password,this);
+		mAuthTask = new UserLoginTask(email, password,mainActivity);
 		LogWrapper.d(Definitions.loginLogTag,"Start background task");
 		mAuthTask.execute((Void) null);
 		
@@ -133,17 +124,17 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
 		LogWrapper.d(Definitions.loginLogTag,
 					"Check for a valid email address.");
 		if (mailIsEmpty(email)) {
-			mEmailView.setError(getString(R.string.error_field_required));
+			mEmailView.setError(mainActivity.getString(R.string.error_field_required));
 			return mEmailView;
 		}
 		if (mailExistsAndIsInvalid(email)) {
-			mEmailView.setError(getString(R.string.error_invalid_email));
+			mEmailView.setError(mainActivity.getString(R.string.error_invalid_email));
 			return mEmailView;
 		}
 		LogWrapper.d(Definitions.loginLogTag,
 				"Check for a valid password, if the user entered one.");
 		if (passwordExistsAndIsInvalid(password)){
-			mPasswordView.setError(getString(R.string.error_invalid_password));
+			mPasswordView.setError(mainActivity.getString(R.string.error_invalid_password));
 			return mPasswordView;
 		}
 		return null;
@@ -193,7 +184,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
 
 	private void useHoneyCombMr2ViewPropertyAnimatorApiToFadeInProgressSpinner(
 													final boolean show) {
-		int shortAnimTime = getResources().getInteger(
+		int shortAnimTime = mainActivity.getResources().getInteger(
 				android.R.integer.config_shortAnimTime);
 		LogWrapper.d(Definitions.loginLogTag,"use HoneyCombMr2 api's");
 		setViewProperties(true,mLoginFormView,show,shortAnimTime);
@@ -228,7 +219,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
 		String orderPrimaryEmailAddressFirst=
 				ContactsContract.Contacts.Data.IS_PRIMARY + " DESC";
 		CursorLoader loaderQueriesContentResolverReturnCursor=
-				new CursorLoader(this,
+				new CursorLoader(mainActivity,
 						uriRetrieveDataRowsForTheDeviceUsersProfileContact,
 						projection,
 						onlyEmailAddressSelection,
@@ -263,7 +254,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
 
 	private void addEmailsToAutoComplete(List<String> emailAddressCollection) {
 		ArrayAdapter<String> adapterAutoCompleteTextViewShowInDropdownList = 
-				new ArrayAdapter<String>(LoginActivity.this,
+				new ArrayAdapter<String>(mainActivity,
 				android.R.layout.simple_dropdown_item_1line,
 				emailAddressCollection);
 		mEmailView.setAdapter(adapterAutoCompleteTextViewShowInDropdownList);
