@@ -4,7 +4,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.citybike.R;
-import com.citybike.R.id;
+import com.citybike.pantallainicio.FragmentFactory.FragmentFactory;
+import com.citybike.pantallainicio.FragmentFactory.NavigationFragmentFactory;
 import com.citybike.utils.Definitions;
 import com.citybike.utils.LogWrapper;
 
@@ -20,6 +21,7 @@ import android.widget.AdapterView.OnItemClickListener;
 
 public class NavigationListener  implements OnItemClickListener {
 	private PantallaInicio activity;
+	 private FragmentFactory fragmentFactory;  
 	public NavigationListener(PantallaInicio activity) {
 		this.activity=activity;
 	}
@@ -31,11 +33,13 @@ public class NavigationListener  implements OnItemClickListener {
 		LogWrapper.d(Definitions.FragListLogTag,"onItemClick");
 		LogWrapper.d(Definitions.FragListLogTag,
 					"Hicieron click en la posición: "+position+" del menú.");
-		LogWrapper.d(Definitions.FragListLogTag,"Obtengo fragmentMap");
-		Map<Integer, Fragment> fragmentMap=activity.getFragmentMap();
 		LogWrapper.d(Definitions.FragListLogTag,
-					"Obtengo fragment de la posición: "+position);
-		Fragment fragment=fragmentMap.get(position);
+					"Creación del fragment de la posición: "+position);
+		fragmentFactory= new NavigationFragmentFactory();
+		String itemName=activity.getItemName(position);
+		LogWrapper.d(Definitions.FragListLogTag,"Item name: "+itemName);
+		Fragment fragment=fragmentFactory.create(itemName);
+		logFragmentCreationResult(fragment);
 		LogWrapper.d(Definitions.FragListLogTag,"Obtengo fragment Manager");
 		FragmentManager fragmentManager = 
 				 					activity.getSupportFragmentManager(); 
@@ -44,6 +48,7 @@ public class NavigationListener  implements OnItemClickListener {
 		FragmentTransaction transaction=fragmentManager.beginTransaction();
 		LogWrapper.d(Definitions.FragListLogTag,"transaction.replace()");
 		transaction.replace(R.id.content_frame, fragment);
+		transaction.addToBackStack(null);
 		LogWrapper.d(Definitions.FragListLogTag,"transaction.commit()");
 		transaction.commit();
 		LogWrapper.d(Definitions.FragListLogTag,"Reemplazo de fragment ok");
@@ -74,6 +79,12 @@ public class NavigationListener  implements OnItemClickListener {
 		LogWrapper.d(Definitions.FragListLogTag,"Cierro drawer");
 		drawerLayout.closeDrawer(activity.getDrawerList());
 		LogWrapper.d(Definitions.FragListLogTag,"changeTitleToActionBar..OK");
+		
+	}
+	private void logFragmentCreationResult(Fragment fragment) {
+		if (fragment != null) 
+			LogWrapper.d(Definitions.FragListLogTag,"Fragment creado!!");
+		else LogWrapper.e(Definitions.FragListLogTag,"fragment e null!!");
 		
 	}
 }

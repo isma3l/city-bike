@@ -12,9 +12,6 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.citybike.R;
-import com.citybike.R.drawable;
-import com.citybike.R.id;
-import com.citybike.R.layout;
 import com.citybike.utils.ParserCSV;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;

@@ -2,10 +2,6 @@ package com.citybike.pantallainicio;
 
 
 import com.citybike.R;
-import com.citybike.R.drawable;
-import com.citybike.R.id;
-import com.citybike.R.layout;
-import com.citybike.R.menu;
 import com.citybike.pantallainicio.FragmentFactory.FragmentFactory;
 import com.citybike.pantallainicio.FragmentFactory.NavigationFragmentFactory;
 import com.citybike.utils.Definitions;
@@ -34,9 +30,8 @@ public class PantallaInicio extends ActionBarActivity {
     private ListView drawerList;
     private String tituloFragmentSeleccionado;
     private DrawerToggle drawerToggle; 
+    private FragmentFactory fragmentFactory;
     private List<Map<String, Object>> optionList;
-    private Map<Integer,Fragment> fragmentMap;
-    private FragmentFactory fragmentFactory;  
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -44,19 +39,23 @@ public class PantallaInicio extends ActionBarActivity {
 					"onCreate()... Comienzo del ciclo de vida de la actividad");
         setContentView(R.layout.layout_pantalla_inicio); 
         LogWrapper.d(Definitions.mainLogTag,
-        			"setContentView(layout_pantalla_inicio)... OK");   
+        			"setContentView(layout_pantalla_inicio)... OK");  
+        addInitialFragment();
 		createApplicationMainOptions();       
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
 	}	
-	private void addInitialFragment(Fragment fragment) {
+	private void addInitialFragment() {
 		LogWrapper.d(Definitions.mainLogTag,"addInitialFragment()");
         FragmentManager fragmentManager = getSupportFragmentManager();
         LogWrapper.d(Definitions.mainLogTag,"getSupportFragmentManager ... OK");
+        fragmentFactory= new NavigationFragmentFactory();
+        Fragment fragment=fragmentFactory.create(Definitions.home);
         FragmentTransaction fragmentTransaction=
         									fragmentManager.beginTransaction();
         LogWrapper.d(Definitions.mainLogTag,"FragmentTransaction ...OK");
         fragmentTransaction.add(R.id.content_frame,fragment);
+        fragmentTransaction.addToBackStack(null);
         LogWrapper.d(Definitions.mainLogTag,
         			"fragmentTransaction.add(R.id.content_frame, "
         			+ "new FragmentBase()) ... OK");
@@ -96,10 +95,6 @@ public class PantallaInicio extends ActionBarActivity {
         			"Listview 'drawerList' created with  findViewById(R.id."
         			+ "left_drawer)... OK");
         optionList=new ArrayList<Map<String,Object>>();
-        fragmentMap=new HashMap<Integer,Fragment>();
-		LogWrapper.d(Definitions.FragListLogTag,"fragmentMap creado");
-		fragmentFactory= new NavigationFragmentFactory();
-		LogWrapper.d(Definitions.FragListLogTag,"fragmentFactory creada");
         addItemsToOptionList();
         setAdapterToDrawerList(drawerList);
         drawerList.setOnItemClickListener(new NavigationListener(this));
@@ -189,31 +184,15 @@ public class PantallaInicio extends ActionBarActivity {
 		LogWrapper.d(Definitions.mainLogTag,
 					"Agrego el mapa a la lista de opciones");
 		optionList.add(optionsMap);
-		Fragment fragment= fragmentFactory.create(appLabel);
-		logFragmentCreationResult(fragment);
 		Integer pos=optionList.size()-1;
 		LogWrapper.d(Definitions.mainLogTag,
-					"(pos,Fragment): ("+pos+","+appLabel+")");
-		fragmentMap.put(pos, fragment);
-		if (appLabel.equals(Definitions.home))
-			addInitialFragment(fragment);
-	}
-	public Map<Integer, Fragment> getFragmentMap() {
-		return fragmentMap;
+					"(pos,item): ("+pos+","+appLabel+")");
 	}
 	public List<Map<String, Object>> getOptionList() {
 		return optionList;
 	}
 	public DrawerLayout getDrawerLayout() {
 		return drawerLayout;
-	}
-
-
-	private void logFragmentCreationResult(Fragment fragment) {
-		if (fragment != null) 
-			LogWrapper.d(Definitions.mainLogTag,"Fragment creado!!");
-		else LogWrapper.e(Definitions.mainLogTag,"fragment e null!!");
-		
 	}
 
 
@@ -253,7 +232,12 @@ public class PantallaInicio extends ActionBarActivity {
 	public boolean onPrepareOptionsMenu(Menu menu) { 	  
 	    return super.onPrepareOptionsMenu(menu);
 	}
-	
+	@Override
+	public void onBackPressed() {
+		FragmentManager fm = getSupportFragmentManager();
+	    fm.popBackStack();
+	    return;
+	}
 	public void setTituloFragmentSeleccionado(String tituloFragmentSeleccionado) {
 		this.tituloFragmentSeleccionado = tituloFragmentSeleccionado;
 	}
@@ -266,5 +250,8 @@ public class PantallaInicio extends ActionBarActivity {
 		return drawerList;
 	}
 	
-	
+	public String getItemName(int position){
+		Map<String, Object> item=optionList.get(position);
+		return (String )item.get(Definitions.appName);
+	}
 }
