@@ -5,12 +5,21 @@
     android:background="#088A08"
     android:orientation="vertical">
  
-     <fragment 
-    	android:id="@+id/map_circuitos" 
-        android:layout_width="match_parent" 
-        android:layout_height="match_parent" 
-        class="com.google.android.gms.maps.SupportMapFragment" />
-     
+<fragment 
+  	android:id="@+id/map_circuitos" 
+    android:layout_width="match_parent" 
+    android:layout_height="match_parent" 
+    class="com.google.android.gms.maps.SupportMapFragment" />
+
+<LinearLayout android:id="@+id/id_contactos_ckto"
+    android:layout_width="200dp"
+    android:layout_height="wrap_content"
+    android:background="#0000FF"
+    android:orientation="vertical"
+    android:layout_gravity="center">
+
+</LinearLayout>
+
  <RadioGroup
      android:id="@+id/radioGroup1"
      android:layout_width="match_parent"
@@ -31,6 +40,15 @@
         android:text="Crear"
         android:textSize="13dp" />
 
+     <Button
+        android:id="@+id/id_b_borrarCircuito"
+        android:layout_width="95dp"
+        android:layout_height="wrap_content"
+        android:drawableTop="@drawable/eraser32x32"
+        android:minWidth="70dip"
+        android:text="Borrar"
+        android:textSize="13dp" />
+     
     <Button
         android:id="@+id/id_b_guardarCircuito"
         android:layout_width="95dp"
@@ -59,5 +77,6 @@
      android:background="#00000000"
      android:padding="15dp"
      android:src="@drawable/facebook51x51" />
+
 
 </FrameLayout>

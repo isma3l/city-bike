@@ -4,6 +4,7 @@ package com.citybike.pantallainicio;
 import com.citybike.R;
 import com.citybike.pantallainicio.FragmentFactory.FragmentFactory;
 import com.citybike.pantallainicio.FragmentFactory.NavigationFragmentFactory;
+import com.citybike.pantallainicio.Fragments.DialogInviteContacts;
 import com.citybike.utils.Definitions;
 import com.citybike.utils.LogWrapper;
 
@@ -250,8 +251,19 @@ public class PantallaInicio extends ActionBarActivity {
 		return drawerList;
 	}
 	
+
+	// este metodo se usa para mostrar el dialogo que permite invitar contactos
+	// es el camino mas facil y rapido que encontre, 
+	// no es eficiente ni tiene buen diseño, pero permite mostrar los "contactos"
+	public void mostrarDialogoInvitarContactos() {
+		android.app.FragmentManager fm = getFragmentManager();
+		DialogInviteContacts alert = new DialogInviteContacts();
+		alert.show(fm, "dialog_contact");
+	}
+
 	public String getItemName(int position){
 		Map<String, Object> item=optionList.get(position);
 		return (String )item.get(Definitions.appName);
 	}
+
 }
