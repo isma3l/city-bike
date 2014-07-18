@@ -237,8 +237,8 @@ public class PantallaInicio extends ActionBarActivity {
 	public void onBackPressed() {
 		FragmentManager fm = getSupportFragmentManager();
 	    fm.popBackStack();
-	    return;
 	}
+	
 	public void setTituloFragmentSeleccionado(String tituloFragmentSeleccionado) {
 		this.tituloFragmentSeleccionado = tituloFragmentSeleccionado;
 	}

@@ -19,4 +19,8 @@ public class Definitions {
 	public static final String TAG = "SelectionFragment";
 	public static final String SPLASH="splash";
 	public static final String SELECTION="selection";
+	public static final String fragmentMapTag="FragmentMap";
+	public static final String serializableKeyShowBikeStations="show Stations";
+	public static final String serializableKeyShowBikeWorkshop="show workshop";
+	public static final String FragmentCircuitLogTag = "FragmentCircuit";
 }
