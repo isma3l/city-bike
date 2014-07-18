@@ -1,7 +1,13 @@
 package com.citybike.pantallainicio.Fragments;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
+import org.json.JSONObject;
+
+import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -9,17 +15,23 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.Toast;
 
 import com.citybike.R;
+import com.citybike.pantallainicio.RouteManager;
+import com.citybike.utils.HttpConnection;
+import com.citybike.utils.LogWrapper;
 import com.citybike.utils.ParserCSV;
+import com.citybike.utils.PathJSONParser;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 
 
 
@@ -32,6 +44,9 @@ public class FragmentMapa extends Fragment {
 	private ArrayList<Marker> estaciones = new ArrayList<Marker>();
 	private boolean mostrandoBicicleterias = false;
 	private boolean mostrandoEstaciones = false;
+	private RouteManager routeManager = new RouteManager();
+	private Polyline routeView = null;
+	private boolean routesButtonToggle = false;
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {		 
@@ -46,7 +61,6 @@ public class FragmentMapa extends Fragment {
 		b_bicicleteria.setOnClickListener(new OnClickListener() {			
 			@Override
 			public void onClick(View v) {
-		        //Toast.makeText(getActivity(), "Mostrar bicicleterias en el mapa", Toast.LENGTH_SHORT).show();
 				if (!mostrandoBicicleterias){
 					mostrandoBicicleterias = true;					
 				}else{
@@ -80,10 +94,30 @@ public class FragmentMapa extends Fragment {
 		b_rutas.setOnClickListener(new OnClickListener() {			
 			@Override
 			public void onClick(View v) {
-		        Toast.makeText(getActivity(), "Mostrar rutas amigables", Toast.LENGTH_SHORT).show();
-				
+		        if (routesButtonToggle == false){
+		        	routesButtonToggle = true;
+			        mMap.setOnMapClickListener(new OnMapClickListener(){
+			        	boolean showingRoute = false;
+						@Override
+						public void onMapClick(LatLng point) {
+							if( !showingRoute ){
+								routeManager.addDirection(point);
+								if (routeManager.isRouteCompleted()){
+									String url = routeManager.getRouteQueryURL();
+									ReadTask downloadTask = new ReadTask();
+									downloadTask.execute(url);
+									showingRoute = true;
+								}
+							}
+						}		
+			        });  
+		        }else{
+		        	resetRouteCreation();
+		        }
 			}
 		});
+		
+		
 		return view;
 	}
 
@@ -206,6 +240,87 @@ public class FragmentMapa extends Fragment {
 		for(Marker marcador : estaciones){
 			marcador.setVisible(mostrar);
 		}
+	}
+	
+	private void resetRouteCreation(){
+		routeManager.clear();
+		routeView.remove();
+		routesButtonToggle = false;
+	}
+	
+	////////////Clases privadas para la consulta de rutas////////////
+	
+	////////////////////ReadTask/////////////////////////
+	private class ReadTask extends AsyncTask<String, Void, String> {
+
+		@Override
+		protected String doInBackground(String... url) {		
+			String data = "";
+			try {
+		        HttpConnection http = new HttpConnection();
+		        data = http.readUrl(url[0]);
+		        } catch (Exception e) {
+		        	LogWrapper.d("Tarea en 2do plano", e.toString());
+		    }
+			return data;
+		}
+		
+		@Override
+	    protected void onPostExecute(String result) {
+			super.onPostExecute(result);
+			new ParserTask().execute(result);
+	    }
+
+	}
+	
+	////////////////////ParserTask///////////////////////
+	
+	private class ParserTask extends AsyncTask<String, Integer, List<List<HashMap<String, String>>>> {
+
+		@Override
+		protected List<List<HashMap<String, String>>> doInBackground(String... jsonData) {
+			JSONObject jObject;
+		    List<List<HashMap<String, String>>> routes = null;
+		 
+		    try {
+		        jObject = new JSONObject(jsonData[0]);
+		        PathJSONParser parser = new PathJSONParser();
+		        routes = parser.parse(jObject);
+	        } catch (Exception e) {
+		        e.printStackTrace();
+	        }
+		    return routes;
+		}
+		
+		@Override
+	    protected void onPostExecute(List<List<HashMap<String, String>>> routes) {
+			ArrayList<LatLng> points = null;
+			PolylineOptions polyLineOptions = null;
+	 
+			//recorre las rutas y agrega sus puntos a la polyline
+			for (int i = 0; i < routes.size(); i++) {
+				points = new ArrayList<LatLng>();
+				polyLineOptions = new PolylineOptions();
+				List<HashMap<String, String>> path = routes.get(i);
+	 
+				for (int j = 0; j < path.size(); j++) {
+					HashMap<String, String> point = path.get(j);
+	 
+					double lat = Double.parseDouble(point.get("lat"));
+					double lng = Double.parseDouble(point.get("lng"));
+					LatLng position = new LatLng(lat, lng);
+	 
+					points.add(position);
+				}
+	 
+				polyLineOptions.addAll(points);
+				polyLineOptions.width(2);
+				polyLineOptions.color(Color.BLUE);
+			}
+	 
+			routeView = mMap.addPolyline(polyLineOptions);
+	    }
+
 	}
 	
 }

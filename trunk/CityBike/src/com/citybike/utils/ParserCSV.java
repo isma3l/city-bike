@@ -1,10 +1,6 @@
 package com.citybike.utils;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
@@ -23,9 +19,6 @@ public class ParserCSV {
 		ArrayList<String[]> lineas = new ArrayList<String[]>();
 		
 		try{
-			//File csv = new File(rutaArchivo);
-			//FileInputStream fis = new FileInputStream( csv );
-			//BufferedInputStream bis = new BufferedInputStream( fis );
 			InputStreamReader isr = new InputStreamReader( recursos.getAssets().open(nombreArchivo) );
 			br = new BufferedReader( isr );
 			
