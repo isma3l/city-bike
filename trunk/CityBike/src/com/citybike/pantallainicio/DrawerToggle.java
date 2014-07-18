@@ -21,12 +21,12 @@ public class DrawerToggle extends ActionBarDrawerToggle {
 	 
 	@Override
 	public void onDrawerClosed(View view) {
-		pantallaInicio.getSupportActionBar().setTitle(pantallaInicio.getSectionTitle());
+		pantallaInicio.getActionBar().setTitle(pantallaInicio.getSectionTitle());
     }
 
 	@Override
     public void onDrawerOpened(View drawerView) {
-        pantallaInicio.getSupportActionBar().setTitle(pantallaInicio.getTitle());
+        pantallaInicio.getActionBar().setTitle(pantallaInicio.getTitle());
     }
 }
 

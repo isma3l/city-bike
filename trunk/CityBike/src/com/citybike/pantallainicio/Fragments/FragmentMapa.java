@@ -10,6 +10,8 @@ import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -18,6 +20,7 @@ import android.widget.Button;
 
 import com.citybike.R;
 import com.citybike.pantallainicio.RouteManager;
+import com.citybike.pantallainicio.Fragments.GoogleMapFragment.OnGoogleMapFragmentListener;
 import com.citybike.utils.HttpConnection;
 import com.citybike.utils.LogWrapper;
 import com.citybike.utils.ParserCSV;
@@ -35,29 +38,69 @@ import com.google.android.gms.maps.model.PolylineOptions;
 
 
 
-public class FragmentMapa extends Fragment {
+public class FragmentMapa extends Fragment{
 	private GoogleMap mMap;	
-	private final LatLng CENTRO = new LatLng(-34.60, -58.38);
-	private final String CSVBicicleterias = "bicicleterias.csv";
-	private final String CSVEstaciones = "estaciones.csv";
-	private ArrayList<Marker> bicicleterias = new ArrayList<Marker>();
-	private ArrayList<Marker> estaciones = new ArrayList<Marker>();
-	private boolean mostrandoBicicleterias = false;
-	private boolean mostrandoEstaciones = false;
-	private RouteManager routeManager = new RouteManager();
-	private Polyline routeView = null;
-	private boolean routesButtonToggle = false;
+	private SupportMapFragment fragment;
+	private LatLng CENTRO;
+	private String CSVBicicleterias;
+	private String CSVEstaciones;
+	private ArrayList<Marker> bicicleterias;
+	private ArrayList<Marker> estaciones;
+	private boolean mostrandoBicicleterias;
+	private boolean mostrandoEstaciones;
+	private RouteManager routeManager;
+	private Polyline routeView;
+	private boolean routesButtonToggle;
+	private Button b_bicicleteria;
+	private Button b_estaciones;
+	private Button b_rutas;
 	
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {		 
-		View view = inflater.inflate(R.layout.fragment_pantalla_principal, null, false);		
-		setUpMapIfNeeded();		
-		
-		Button b_bicicleteria = (Button) view.findViewById(R.id.id_b_bicleteria);
-		//Button b_talleres = (Button) view.findViewById(R.id.id_b_talleres);
-		Button b_estaciones = (Button) view.findViewById(R.id.id_b_bicisendas);
-		Button b_rutas = (Button) view.findViewById(R.id.id_b_rutas);
-		
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		CENTRO = new LatLng(-34.60, -58.38);
+		CSVBicicleterias = "bicicleterias.csv";
+		CSVEstaciones = "estaciones.csv";
+		bicicleterias = new ArrayList<Marker>();
+		estaciones = new ArrayList<Marker>();
+		mostrandoBicicleterias = false;
+		mostrandoEstaciones = false;
+		routeManager = new RouteManager();
+		routeView = null;
+		routesButtonToggle = false;
+	}
+	@Override
+	public View onCreateView(LayoutInflater inflater,
+							ViewGroup container,
+							Bundle savedInstanceState) {		 
+		View view = inflater.inflate(R.layout.fragment_pantalla_principal,
+									container,
+									false);			
+		if (view !=null){
+			b_bicicleteria = (Button) view.findViewById(R.id.id_b_bicleteria);
+			//Button b_talleres = (Button) view.findViewById(R.id.id_b_talleres);
+			b_estaciones = (Button) view.findViewById(R.id.id_b_bicisendas);
+			b_rutas = (Button) view.findViewById(R.id.id_b_rutas);
+		}
+		return view;
+	}
+
+	@Override
+	public void onActivityCreated(Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
+		FragmentManager fm = getChildFragmentManager();
+	    fragment = (SupportMapFragment) fm.findFragmentById(R.id.map);
+	    if (fragment == null) {
+	        fragment = SupportMapFragment.newInstance();
+	        FragmentTransaction fragmentTransaction=fm.beginTransaction();
+	        fragmentTransaction.replace(R.id.map, fragment);
+	        fragmentTransaction.addToBackStack(null);
+	        fragmentTransaction.commit();
+	    }
+	}
+	@Override
+	public void onViewCreated(View view,Bundle savedInstanceState) {
+		super.onViewCreated(view,savedInstanceState);
 		b_bicicleteria.setOnClickListener(new OnClickListener() {			
 			@Override
 			public void onClick(View v) {
@@ -116,22 +159,17 @@ public class FragmentMapa extends Fragment {
 		        }
 			}
 		});
-		
-		
-		return view;
 	}
-
 	@Override
 	public void onResume() {
         super.onResume();
         setUpMapIfNeeded();
     }
-	
 	private void setUpMapIfNeeded() {
     	// Si el nMap esta null entonces es porque no se instancio el mapa.
         if (mMap == null) {
         	// Intenta obtener el mapa del SupportMapFragment. 
-            mMap = ((SupportMapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
+            mMap = fragment.getMap();
             // Comprueba si hemos tenido éxito en la obtención del mapa.
             if (mMap != null) {
                 setUpMap();
@@ -154,11 +192,11 @@ public class FragmentMapa extends Fragment {
 	 */
 	@Override
 	public void onDestroyView() {
-		SupportMapFragment f_creado = (SupportMapFragment) getFragmentManager().findFragmentById(R.id.map);
-
-		if (f_creado != null) {
+		FragmentManager fm = getChildFragmentManager();
+		fragment = (SupportMapFragment) fm.findFragmentById(R.id.map);
+		if (fragment != null) {
 	        try {
-	            getFragmentManager().beginTransaction().remove(f_creado).commit();
+	            getFragmentManager().beginTransaction().remove(fragment).commit();
 
 	        } catch (Exception e) {
 	            e.printStackTrace();
@@ -166,7 +204,6 @@ public class FragmentMapa extends Fragment {
 	    }		
 		super.onDestroyView();
 	}
-	
 	private ArrayList<MarkerOptions> generarMarcadoresBicicleterias(String rutaCSV){
 		ParserCSV.cargarParser(getResources());
 		ArrayList<String[]> lineas = ParserCSV.parsearArchivo(rutaCSV, 9);
