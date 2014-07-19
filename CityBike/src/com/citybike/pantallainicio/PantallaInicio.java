@@ -18,6 +18,7 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentManager.BackStackEntry;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 
@@ -33,6 +34,7 @@ public class PantallaInicio extends ActionBarActivity {
     private DrawerToggle drawerToggle; 
     private FragmentFactory fragmentFactory;
     private List<Map<String, Object>> optionList;
+    private ReplaceFragment replaceFragment=null;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -41,6 +43,7 @@ public class PantallaInicio extends ActionBarActivity {
         setContentView(R.layout.layout_pantalla_inicio); 
         LogWrapper.d(Definitions.mainLogTag,
         			"setContentView(layout_pantalla_inicio)... OK");  
+        replaceFragment= new PantallaInicioReplaceFragment(this);
         addInitialFragment();
 		createApplicationMainOptions();       
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -55,17 +58,22 @@ public class PantallaInicio extends ActionBarActivity {
         FragmentTransaction fragmentTransaction=
         									fragmentManager.beginTransaction();
         LogWrapper.d(Definitions.mainLogTag,"FragmentTransaction ...OK");
-        fragmentTransaction.add(R.id.content_frame,fragment);
-        fragmentTransaction.addToBackStack(null);
-        LogWrapper.d(Definitions.mainLogTag,
-        			"fragmentTransaction.add(R.id.content_frame, "
-        			+ "new FragmentBase()) ... OK");
+        addAndLog(fragmentTransaction,fragment);
         fragmentTransaction.commit();  
         LogWrapper.d(Definitions.mainLogTag,
         			"fragmentTransaction.commit()... OK");
         LogWrapper.d(Definitions.mainLogTag,
         			"Se asignó por defecto en la pantalla principal el fragment"
         			+ " base");	
+	}
+	private void addAndLog(FragmentTransaction fragmentTransaction,
+												Fragment fragment) {
+		fragmentTransaction.add(R.id.content_frame,fragment,Definitions.home);
+        LogWrapper.d(Definitions.mainLogTag,
+        			"fragmentTransaction.add(R.id.content_frame, "
+        			+ "new FragmentBase()) ... OK");
+        fragmentTransaction.addToBackStack(Definitions.home);
+		
 	}
 	private void createApplicationMainOptions() {
 		LogWrapper.d(Definitions.mainLogTag,"createApplicationMainOptions()");
@@ -98,7 +106,10 @@ public class PantallaInicio extends ActionBarActivity {
         optionList=new ArrayList<Map<String,Object>>();
         addItemsToOptionList();
         setAdapterToDrawerList(drawerList);
-        drawerList.setOnItemClickListener(new NavigationListener(this));
+        NavigationListener navigationListener=new NavigationListener();
+        navigationListener.setReplaceFragment(
+        					new NavigationListenerReplaceFragment(this));
+        drawerList.setOnItemClickListener(navigationListener);
         LogWrapper.d(Definitions.mainLogTag,
         			"Cuando se toca un item en drawerList se invoca a "
         			+ "NavigationItemClickListener (a su método onItemClick)");
@@ -235,11 +246,27 @@ public class PantallaInicio extends ActionBarActivity {
 	}
 	@Override
 	public void onBackPressed() {
-		FragmentManager fm = getSupportFragmentManager();
-	    fm.popBackStack();
+		super.onBackPressed();
+        LogWrapper.d(Definitions.mainLogTag, "User pressed the back button");
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        int numberOfEntriesInStack=fragmentManager.getBackStackEntryCount();
+        if (numberOfEntriesInStack>0){
+        	int stackTopPosition=numberOfEntriesInStack-1;
+        	BackStackEntry backStackEntry=
+        				fragmentManager.getBackStackEntryAt(stackTopPosition);
+        	fragmentManager.popBackStack(backStackEntry.getId(),
+        				FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        	String itemName= backStackEntry.getName();
+        	 LogWrapper.d(Definitions.mainLogTag,
+        			 "Va a pasar al fragment anterior: "+itemName);
+        	((PantallaInicioReplaceFragment)replaceFragment).
+        									setPositionAnItemName(itemName);
+        	((PantallaInicioReplaceFragment)replaceFragment).start();
+        }
 	}
 	
-	public void setTituloFragmentSeleccionado(String tituloFragmentSeleccionado) {
+	public void setTituloFragmentSeleccionado(
+											String tituloFragmentSeleccionado) {
 		this.tituloFragmentSeleccionado = tituloFragmentSeleccionado;
 	}
 	public String getSectionTitle() {
@@ -254,7 +281,7 @@ public class PantallaInicio extends ActionBarActivity {
 
 	// este metodo se usa para mostrar el dialogo que permite invitar contactos
 	// es el camino mas facil y rapido que encontre, 
-	// no es eficiente ni tiene buen diseño, pero permite mostrar los "contactos"
+	//no es eficiente ni tiene buen diseño, pero permite mostrar los "contactos"
 	public void mostrarDialogoInvitarContactos() {
 		android.app.FragmentManager fm = getFragmentManager();
 		DialogInviteContacts alert = new DialogInviteContacts();

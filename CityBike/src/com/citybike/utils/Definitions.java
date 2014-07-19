@@ -23,4 +23,5 @@ public class Definitions {
 	public static final String serializableKeyShowBikeStations="show Stations";
 	public static final String serializableKeyShowBikeWorkshop="show workshop";
 	public static final String FragmentCircuitLogTag = "FragmentCircuit";
+	public static final String ReplaceFragmentLogTag ="ReplaceFragment";
 }

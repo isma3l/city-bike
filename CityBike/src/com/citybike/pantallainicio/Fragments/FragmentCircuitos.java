@@ -3,7 +3,8 @@ package com.citybike.pantallainicio.Fragments;
 import com.citybike.R;
 import com.citybike.pantallainicio.CircuitManager;
 import com.citybike.pantallainicio.PantallaInicio;
-import com.citybike.pantallainicio.Fragments.GoogleMapFragment.OnGoogleMapFragmentListener;
+import com.citybike.pantallainicio.Fragments.GoogleMapFragment.
+													OnGoogleMapFragmentListener;
 import com.citybike.utils.Definitions;
 import com.citybike.utils.LogWrapper;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -25,7 +26,8 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 
 
-public class FragmentCircuitos extends Fragment implements OnGoogleMapFragmentListener{
+public class FragmentCircuitos extends Fragment 
+								implements OnGoogleMapFragmentListener{
 	private GoogleMap mMap;	
 	private SupportMapFragment fragment;
 	private LatLng HAMBURG;
@@ -45,16 +47,22 @@ public class FragmentCircuitos extends Fragment implements OnGoogleMapFragmentLi
 	}
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+	public View onCreateView(LayoutInflater inflater,
+								ViewGroup container,
+								Bundle savedInstanceState) {
 		LogWrapper.d(Definitions.FragmentCircuitLogTag,"onCreateView()");
 		setRetainInstance(true);
-		View view = inflater.inflate(R.layout.layout_fragment_circuitos,container, false);
+		View view = inflater.inflate(R.layout.layout_fragment_circuitos,
+																container,
+																false);
 		if (view !=null){
-			b_crearCircuito= (Button) view.findViewById(R.id.id_b_crearCircuito);
+			b_crearCircuito=(Button) view.findViewById(R.id.id_b_crearCircuito);
 			b_guardar = (Button) view.findViewById(R.id.id_b_guardarCircuito);
-			b_invitarContacto = (Button) view.findViewById(R.id.id_b_invitarContacto);		
+			b_invitarContacto=
+						(Button) view.findViewById(R.id.id_b_invitarContacto);		
 			b_facebook = (ImageButton) view.findViewById(R.id.id_b_facebook);
-			b_borrarCircuito = (Button) view.findViewById(R.id.id_b_borrarCircuito);		
+			b_borrarCircuito=
+						(Button) view.findViewById(R.id.id_b_borrarCircuito);		
 		}
 		return view;
 	}
@@ -88,7 +96,9 @@ public class FragmentCircuitos extends Fragment implements OnGoogleMapFragmentLi
 			@Override
 			public void onClick(View v) {
 				if(circuitManager.circuit()) {
-					Toast.makeText(getActivity(), "Se guardo satisfactoriamente", Toast.LENGTH_SHORT).show();
+					Toast.makeText(getActivity(),
+									"Se guardo satisfactoriamente",
+									Toast.LENGTH_SHORT).show();
 				}
 			}
 		});
@@ -96,18 +106,21 @@ public class FragmentCircuitos extends Fragment implements OnGoogleMapFragmentLi
 		b_invitarContacto.setOnClickListener(new OnClickListener() {			
 			@Override
 			public void onClick(View v) {
-				((PantallaInicio)getActivity()).mostrarDialogoInvitarContactos();
+				((PantallaInicio)getActivity()).
+											mostrarDialogoInvitarContactos();
 			}
 		});
 		
 		b_facebook.setOnClickListener(new OnClickListener() {			
 			@Override
 			public void onClick(View v) {
-		        Toast.makeText(getActivity(), "Compartir en facebook", Toast.LENGTH_SHORT).show();
+		        Toast.makeText(getActivity(), "Compartir en facebook",
+		        							Toast.LENGTH_SHORT).show();
 				
 			}
 		});
-		if (mMap==null) LogWrapper.e(Definitions.FragmentCircuitLogTag,"mMap es null");
+		if (mMap==null) LogWrapper.e(Definitions.FragmentCircuitLogTag,
+														"mMap es null");
 		mMap.setOnMapClickListener(new OnMapClickListener(
 				) {
 			@Override
@@ -129,9 +142,10 @@ public class FragmentCircuitos extends Fragment implements OnGoogleMapFragmentLi
 	        fragment = SupportMapFragment.newInstance();
 	        FragmentTransaction fragmentTransaction=fm.beginTransaction();
 	        fragmentTransaction.replace(R.id.map_circuitos, fragment);
-	        fragmentTransaction.addToBackStack(null);
+	        
 	        fragmentTransaction.commit();
-	    }else LogWrapper.d(Definitions.FragmentCircuitLogTag,"fragment no es null");
+	    }else LogWrapper.d(Definitions.FragmentCircuitLogTag,
+	    								"fragment no es null");
 		
 	}
 
@@ -150,15 +164,20 @@ public class FragmentCircuitos extends Fragment implements OnGoogleMapFragmentLi
 
     	// Si el nMap esta null entonces es porque no se instancio el mapa.
         if (mMap == null) {
-        	LogWrapper.d(Definitions.FragmentCircuitLogTag,"setUpMapIfNeeded: mMap es null. obtengo mapa con el fragment");
+        	LogWrapper.d(Definitions.FragmentCircuitLogTag,"setUpMapIfNeeded: "
+        					+ "mMap es null. obtengo mapa con el fragment");
         	// Intenta obtener el mapa del SupportMapFragment. 
             mMap = fragment.getMap();
             // Comprueba si hemos tenido éxito en la obtención del mapa.
             if (mMap != null) {
-            	LogWrapper.d(Definitions.FragmentCircuitLogTag,"setUpMapIfNeeded: mMap ya no es null");
+            	LogWrapper.d(Definitions.FragmentCircuitLogTag,
+            			"setUpMapIfNeeded: mMap ya no es null");
                 setUpMap();
-            }else LogWrapper.d(Definitions.FragmentCircuitLogTag,"setUpMapIfNeeded: el mapa sigue siendo null culpa de fragment.getMap()");
-        }else LogWrapper.d(Definitions.FragmentCircuitLogTag,"mMap no es null ni bien comienza setUpMapIfNeeded");
+            }else LogWrapper.d(Definitions.FragmentCircuitLogTag,"setUpMapIf"
+            		+ "Needed: el mapa sigue siendo null culpa de "
+            		+ "fragment.getMap()");
+        }else LogWrapper.d(Definitions.FragmentCircuitLogTag,"mMap no es null "
+        								+ "ni bien comienza setUpMapIfNeeded");
     }
 	
 	@Override
@@ -168,7 +187,10 @@ public class FragmentCircuitos extends Fragment implements OnGoogleMapFragmentLi
 		fragment = (SupportMapFragment) fm.findFragmentById(R.id.map_circuitos);
 		if (fragment!= null) {
 	        try {
-	            getFragmentManager().beginTransaction().remove(fragment).commit();
+	            getFragmentManager()
+	            	.beginTransaction()
+	            	.remove(fragment)
+	            	.commit();
 
 	        } catch (Exception e) {
 	            e.printStackTrace();
