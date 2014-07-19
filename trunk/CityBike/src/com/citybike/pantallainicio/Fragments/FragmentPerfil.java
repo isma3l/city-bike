@@ -1,8 +1,6 @@
 package com.citybike.pantallainicio.Fragments;
 
 import com.citybike.R;
-import com.citybike.R.layout;
-
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -19,6 +17,8 @@ public class FragmentPerfil extends Fragment{
 			Bundle savedInstanceState) {
 
 		Log.v(LOG_TAG, "dentro del oncreateview del fragment 1");
-		return inflater.inflate(R.layout.layout_fragment_perfil, container, false);
+		return inflater.inflate(R.layout.layout_fragment_perfil,
+														container,
+														false);
 	}
 }

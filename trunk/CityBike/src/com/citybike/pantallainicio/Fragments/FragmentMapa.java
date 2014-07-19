@@ -20,7 +20,6 @@ import android.widget.Button;
 
 import com.citybike.R;
 import com.citybike.pantallainicio.RouteManager;
-import com.citybike.pantallainicio.Fragments.GoogleMapFragment.OnGoogleMapFragmentListener;
 import com.citybike.utils.HttpConnection;
 import com.citybike.utils.LogWrapper;
 import com.citybike.utils.ParserCSV;
@@ -94,7 +93,6 @@ public class FragmentMapa extends Fragment{
 	        fragment = SupportMapFragment.newInstance();
 	        FragmentTransaction fragmentTransaction=fm.beginTransaction();
 	        fragmentTransaction.replace(R.id.map, fragment);
-	        fragmentTransaction.addToBackStack(null);
 	        fragmentTransaction.commit();
 	    }
 	}
@@ -176,7 +174,6 @@ public class FragmentMapa extends Fragment{
             }
         }
     }
-	
 	private void setUpMap() {
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(CENTRO, 11));
         colocarMarcadoresBicicleterias(CSVBicicleterias);
@@ -359,5 +356,4 @@ public class FragmentMapa extends Fragment{
 	    }
 
 	}
-	
 }
