@@ -19,7 +19,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.citybike.R;
-import com.citybike.pantallainicio.RouteManager;
+import com.citybike.pantallamapa.RouteManager;
 import com.citybike.utils.HttpConnection;
 import com.citybike.utils.LogWrapper;
 import com.citybike.utils.ParserCSV;
