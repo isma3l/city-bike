@@ -1,4 +1,4 @@
-package com.citybike.pantallainicio;
+package com.citybike.pantallamapa;
 
 import com.google.android.gms.maps.model.LatLng;
 
