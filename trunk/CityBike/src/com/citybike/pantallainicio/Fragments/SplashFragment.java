@@ -14,7 +14,12 @@ import android.view.ViewGroup;
 
 public class SplashFragment extends Fragment{
 	
-
+	public static SplashFragment newInstance(Bundle args){
+		SplashFragment splashFragment=new SplashFragment();
+		if (args !=null) 
+			splashFragment.setArguments(args);
+		return splashFragment;
+	}
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {

@@ -3,20 +3,13 @@ package com.citybike.pantallainicio.Fragments;
 import com.citybike.R;
 import com.citybike.pantallainicio.CircuitManager;
 import com.citybike.pantallainicio.PantallaInicio;
-import com.citybike.pantallainicio.Fragments.GoogleMapFragment.
-													OnGoogleMapFragmentListener;
 import com.citybike.utils.Definitions;
 import com.citybike.utils.LogWrapper;
 import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -26,10 +19,7 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 
 
-public class FragmentCircuitos extends Fragment 
-								implements OnGoogleMapFragmentListener{
-	private GoogleMap mMap;	
-	private SupportMapFragment fragment;
+public class FragmentCircuitos extends FragmentMap{
 	private LatLng HAMBURG;
 	private CircuitManager circuitManager;
 	private Button b_crearCircuito;
@@ -38,6 +28,12 @@ public class FragmentCircuitos extends Fragment
 	private ImageButton b_facebook;
 	private Button b_borrarCircuito;
 	
+	public static FragmentCircuitos newInstance(Bundle args){
+		FragmentCircuitos fragmentCircuitos=new FragmentCircuitos();
+		if (args !=null) 
+			fragmentCircuitos.setArguments(args);
+		return fragmentCircuitos;
+	}
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -50,6 +46,7 @@ public class FragmentCircuitos extends Fragment
 	public View onCreateView(LayoutInflater inflater,
 								ViewGroup container,
 								Bundle savedInstanceState) {
+		super.onCreateView(inflater, container, savedInstanceState);
 		LogWrapper.d(Definitions.FragmentCircuitLogTag,"onCreateView()");
 		setRetainInstance(true);
 		View view = inflater.inflate(R.layout.layout_fragment_circuitos,
@@ -71,15 +68,17 @@ public class FragmentCircuitos extends Fragment
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		LogWrapper.d(Definitions.FragmentCircuitLogTag,"onActivityCreated");
-		createFragmentDynamically();
+		replaceIdMapByGoogleMap(R.id.map_circuitos,savedInstanceState);
 	}
-
-	private void setListenerToFragmentElements() {
+	
+	@Override
+	public void onViewCreated(View view, Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
 		LogWrapper.d(Definitions.FragmentCircuitLogTag,"Seteo listener");
 		b_borrarCircuito.setOnClickListener(new OnClickListener() {			
 			@Override
 			public void onClick(View v) {
-				mMap.clear();
+				getmMap().clear();
 				circuitManager.clear();
 				
 			}
@@ -118,141 +117,29 @@ public class FragmentCircuitos extends Fragment
 		        							Toast.LENGTH_SHORT).show();
 				
 			}
-		});
-		if (mMap==null) LogWrapper.e(Definitions.FragmentCircuitLogTag,
-														"mMap es null");
-		mMap.setOnMapClickListener(new OnMapClickListener(
+		});	
+	}
+	public void setUpMap() {
+		getmMap().setOnMapClickListener(new OnMapClickListener(
 				) {
 			@Override
 			public void onMapClick(LatLng point) {
 				if(circuitManager.isCreated()) {
 					circuitManager.add(point);
-					mMap.addPolyline(circuitManager.getCircuit());
+					getmMap().addPolyline(circuitManager.getCircuit());
 				}
 						
 			}
 		});
-		
-	}
-
-	private void createFragmentDynamically() {
-		FragmentManager fm = getChildFragmentManager();
-	    fragment = (SupportMapFragment) fm.findFragmentById(R.id.map_circuitos);
-	    if (fragment == null) {
-	        fragment = SupportMapFragment.newInstance();
-	        FragmentTransaction fragmentTransaction=fm.beginTransaction();
-	        fragmentTransaction.replace(R.id.map_circuitos, fragment);
-	        
-	        fragmentTransaction.commit();
-	    }else LogWrapper.d(Definitions.FragmentCircuitLogTag,
-	    								"fragment no es null");
-		
-	}
-
-	@Override
-	public void onResume() {
-		super.onResume();
-		setUpMapIfNeeded();
-	}
-
-	private void setUpMap() {
 	//	mMap.addMarker(new MarkerOptions().position(HAMBURG).title("Marker"));
-		mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(HAMBURG, 10));
+		getmMap().moveCamera(CameraUpdateFactory.newLatLngZoom(HAMBURG, 10));
 	}
-	
-	private void setUpMapIfNeeded() {
-
-    	// Si el nMap esta null entonces es porque no se instancio el mapa.
-        if (mMap == null) {
-        	LogWrapper.d(Definitions.FragmentCircuitLogTag,"setUpMapIfNeeded: "
-        					+ "mMap es null. obtengo mapa con el fragment");
-        	// Intenta obtener el mapa del SupportMapFragment. 
-            mMap = fragment.getMap();
-            // Comprueba si hemos tenido éxito en la obtención del mapa.
-            if (mMap != null) {
-            	LogWrapper.d(Definitions.FragmentCircuitLogTag,
-            			"setUpMapIfNeeded: mMap ya no es null");
-                setUpMap();
-            }else LogWrapper.d(Definitions.FragmentCircuitLogTag,"setUpMapIf"
-            		+ "Needed: el mapa sigue siendo null culpa de "
-            		+ "fragment.getMap()");
-        }else LogWrapper.d(Definitions.FragmentCircuitLogTag,"mMap no es null "
-        								+ "ni bien comienza setUpMapIfNeeded");
-    }
-	
 	@Override
 	public void onDestroyView() {
 		LogWrapper.d(Definitions.FragListLogTag,"ckto destruidoooooo");
-		FragmentManager fm = getChildFragmentManager();
-		fragment = (SupportMapFragment) fm.findFragmentById(R.id.map_circuitos);
-		if (fragment!= null) {
-	        try {
-	            getFragmentManager()
-	            	.beginTransaction()
-	            	.remove(fragment)
-	            	.commit();
-
-	        } catch (Exception e) {
-	            e.printStackTrace();
-	        }
-	    }		
+		destroyView(R.id.map_circuitos);		
 		super.onDestroyView();
 	}
-	@Override
-	public void onMapReady(GoogleMap mMap) {
-		this.mMap=mMap;
-		setUpMapIfNeeded();
-		setListenerToFragmentElements();
-	}
-	/*
-	@Override
-	public void onAttach (Activity activity) {
-		super.onAttach(activity);
-		LogWrapper.d("**************", "atachhhhhhhhhhhhh");
-	}
-	@Override
-	public void onCreate (Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		LogWrapper.d("**************", "createeeeeeeeeeee");
-	}
-	@Override
-	public void onActivityCreated (Bundle savedInstanceState) {
-		super.onActivityCreated(savedInstanceState);
-		LogWrapper.d("**************", "activityyyycreateddddd");
-	}
-	@Override
-	public void onViewStateRestored (Bundle savedInstanceState) {
-		super.onViewStateRestored(savedInstanceState);
-		LogWrapper.d("**************", "restoredddddddddddd");
-	}
-	@Override
-	public void onStart () {
-		super.onStart();
-		LogWrapper.d("**************", "startttttttttttt");
-	}
-	@Override
-	public void onResume () {
-		super.onResume();
-		LogWrapper.d("**********", "onResumeeeeeeeeeeeee");
-	}
-	@Override
-	public void onPause () {
-		super.onPause();
-		LogWrapper.d("**********", "onPauseeeeeeeeeeee");
-	}
-
-	@Override
-	public void onStop () {
-		super.onStop();
-		LogWrapper.d("**********", "onStopppppppppppp");
-	}
-
-	@Override
-	public void onDetach () {
-		super.onDetach();
-		LogWrapper.d("**********", "onDetachhhhhhhhhh");
-	}
-	*/
 }
 
 

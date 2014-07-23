@@ -12,6 +12,12 @@ import android.view.View;
 import android.view.ViewGroup;
 
 public class SelectionFragment extends Fragment {
+	public static SelectionFragment newInstance(Bundle args){
+		SelectionFragment selectionFragment=new SelectionFragment();
+		if (args !=null) 
+			selectionFragment.setArguments(args);
+		return selectionFragment;
+	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,

@@ -9,9 +9,6 @@ import org.json.JSONObject;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -20,14 +17,13 @@ import android.widget.Button;
 
 import com.citybike.R;
 import com.citybike.pantallamapa.RouteManager;
+import com.citybike.utils.Definitions;
 import com.citybike.utils.HttpConnection;
 import com.citybike.utils.LogWrapper;
 import com.citybike.utils.ParserCSV;
 import com.citybike.utils.PathJSONParser;
 import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -37,9 +33,8 @@ import com.google.android.gms.maps.model.PolylineOptions;
 
 
 
-public class FragmentMapa extends Fragment{
-	private GoogleMap mMap;	
-	private SupportMapFragment fragment;
+public class FragmentHomeMap extends FragmentMap{
+	
 	private LatLng CENTRO;
 	private String CSVBicicleterias;
 	private String CSVEstaciones;
@@ -54,6 +49,12 @@ public class FragmentMapa extends Fragment{
 	private Button b_estaciones;
 	private Button b_rutas;
 	
+	public static FragmentHomeMap newInstance(Bundle args){
+		FragmentHomeMap fragmentMapa=new FragmentHomeMap();
+		if (args !=null) 
+			fragmentMapa.setArguments(args);
+		return fragmentMapa;
+	}
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -71,7 +72,8 @@ public class FragmentMapa extends Fragment{
 	@Override
 	public View onCreateView(LayoutInflater inflater,
 							ViewGroup container,
-							Bundle savedInstanceState) {		 
+							Bundle savedInstanceState) {
+		 LogWrapper.d(Definitions.fragmentMapTag,"onCreateView()");
 		View view = inflater.inflate(R.layout.fragment_pantalla_principal,
 									container,
 									false);			
@@ -87,18 +89,18 @@ public class FragmentMapa extends Fragment{
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		FragmentManager fm = getChildFragmentManager();
-	    fragment = (SupportMapFragment) fm.findFragmentById(R.id.map);
-	    if (fragment == null) {
-	        fragment = SupportMapFragment.newInstance();
-	        FragmentTransaction fragmentTransaction=fm.beginTransaction();
-	        fragmentTransaction.replace(R.id.map, fragment);
-	        fragmentTransaction.commit();
-	    }
+		 LogWrapper.d(Definitions.fragmentMapTag,"onActivityCreated()");
+		 replaceIdMapByGoogleMap(R.id.map,savedInstanceState);
+	}
+	@Override
+	public void onDetach() {
+		super.onDetach();
+		getGoogleMapFragment().onDetach();
 	}
 	@Override
 	public void onViewCreated(View view,Bundle savedInstanceState) {
 		super.onViewCreated(view,savedInstanceState);
+		LogWrapper.d(Definitions.fragmentMapTag,"onViewCreated()");
 		b_bicicleteria.setOnClickListener(new OnClickListener() {			
 			@Override
 			public void onClick(View v) {
@@ -137,7 +139,7 @@ public class FragmentMapa extends Fragment{
 			public void onClick(View v) {
 		        if (routesButtonToggle == false){
 		        	routesButtonToggle = true;
-			        mMap.setOnMapClickListener(new OnMapClickListener(){
+			        getmMap().setOnMapClickListener(new OnMapClickListener(){
 			        	boolean showingRoute = false;
 						@Override
 						public void onMapClick(LatLng point) {
@@ -158,24 +160,8 @@ public class FragmentMapa extends Fragment{
 			}
 		});
 	}
-	@Override
-	public void onResume() {
-        super.onResume();
-        setUpMapIfNeeded();
-    }
-	private void setUpMapIfNeeded() {
-    	// Si el nMap esta null entonces es porque no se instancio el mapa.
-        if (mMap == null) {
-        	// Intenta obtener el mapa del SupportMapFragment. 
-            mMap = fragment.getMap();
-            // Comprueba si hemos tenido éxito en la obtención del mapa.
-            if (mMap != null) {
-                setUpMap();
-            }
-        }
-    }
-	private void setUpMap() {
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(CENTRO, 11));
+	public void setUpMap() {
+        getmMap().moveCamera(CameraUpdateFactory.newLatLngZoom(CENTRO, 11));
         colocarMarcadoresBicicleterias(CSVBicicleterias);
         colocarMarcadoresEstaciones(CSVEstaciones);
         setVisibilidadBicicleterias(mostrandoBicicleterias);
@@ -189,18 +175,10 @@ public class FragmentMapa extends Fragment{
 	 */
 	@Override
 	public void onDestroyView() {
-		FragmentManager fm = getChildFragmentManager();
-		fragment = (SupportMapFragment) fm.findFragmentById(R.id.map);
-		if (fragment != null) {
-	        try {
-	            getFragmentManager().beginTransaction().remove(fragment).commit();
-
-	        } catch (Exception e) {
-	            e.printStackTrace();
-	        }
-	    }		
+		destroyView(R.id.map);
 		super.onDestroyView();
 	}
+	
 	private ArrayList<MarkerOptions> generarMarcadoresBicicleterias(String rutaCSV){
 		ParserCSV.cargarParser(getResources());
 		ArrayList<String[]> lineas = ParserCSV.parsearArchivo(rutaCSV, 9);
@@ -230,7 +208,7 @@ public class FragmentMapa extends Fragment{
 		ArrayList<MarkerOptions> moBicicleterias = generarMarcadoresBicicleterias(rutaCSV);
 		
 		for(MarkerOptions marcador : moBicicleterias){
-			bicicleterias.add( mMap.addMarker(marcador) );
+			bicicleterias.add( getmMap().addMarker(marcador) );
 		}
 	}
 	
@@ -266,7 +244,7 @@ public class FragmentMapa extends Fragment{
 	private void colocarMarcadoresEstaciones(String rutaCSV){
 		ArrayList<MarkerOptions> moEstaciones = generarMarcadoresEstaciones(rutaCSV);
 		for(MarkerOptions marcador : moEstaciones){
-			estaciones.add( mMap.addMarker(marcador) );
+			estaciones.add( getmMap().addMarker(marcador) );
 		}
 	}
 	
@@ -352,7 +330,7 @@ public class FragmentMapa extends Fragment{
 				polyLineOptions.color(Color.BLUE);
 			}
 	 
-			routeView = mMap.addPolyline(polyLineOptions);
+			routeView = getmMap().addPolyline(polyLineOptions);
 	    }
 
 	}

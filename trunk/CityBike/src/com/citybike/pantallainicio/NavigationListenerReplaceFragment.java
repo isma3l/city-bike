@@ -24,6 +24,8 @@ public class NavigationListenerReplaceFragment extends ReplaceFragment {
 	public void addToBackStack(FragmentTransaction transaction) {
 		LogWrapper.d(Definitions.ReplaceFragmentLogTag,
 						"Agrego al stack: "+getItemName());
+		LogWrapper.d(Definitions.ReplaceFragmentLogTag,
+						"Entra al stack: "+getItemName());
 		transaction.addToBackStack(getItemName());
 	}
 

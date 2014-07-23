@@ -21,6 +21,12 @@ public class FragmentContactos extends ListFragment{
 	ArrayAdapter<ContactsRowManager> adapter;
 	private Button b_eliminar;
 	
+	public static FragmentContactos newInstance(Bundle args){
+		FragmentContactos fragmentContactos=new FragmentContactos();
+		if (args !=null) 
+			fragmentContactos.setArguments(args);
+		return fragmentContactos;
+	}
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
 	        
@@ -57,7 +63,7 @@ public class FragmentContactos extends ListFragment{
 		});
 	}
 	
-	//Contactos hardcodeados - después habrá que tomarlos de algún archivo que haga de BD
+	//Contactos hardcodeados - despuï¿½s habrï¿½ que tomarlos de algï¿½n archivo que haga de BD
 	private List<ContactsRowManager> getModel() {
 		List<ContactsRowManager> list = new ArrayList<ContactsRowManager>();
 		list.add(get("Contacto1"));
