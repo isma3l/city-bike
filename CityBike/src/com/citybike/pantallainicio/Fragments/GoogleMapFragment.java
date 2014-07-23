@@ -6,6 +6,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.citybike.utils.Definitions;
+import com.citybike.utils.LogWrapper;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 
@@ -23,6 +25,7 @@ public class GoogleMapFragment extends SupportMapFragment {
 	@Override
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
+		LogWrapper.d(Definitions.GoogleMapFragLogTag,"onAttach");
 		try {
             callBack = (OnGoogleMapFragmentListener) getActivity();
         } catch (ClassCastException e) {
@@ -33,6 +36,7 @@ public class GoogleMapFragment extends SupportMapFragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
+		LogWrapper.d(Definitions.GoogleMapFragLogTag,"onCreateView()");
 		 View view = super.onCreateView(inflater, container, savedInstanceState);
 	        if (callBack != null) {
 	            callBack.onMapReady(getMap());
@@ -41,6 +45,7 @@ public class GoogleMapFragment extends SupportMapFragment {
 	}
 	@Override
 	public void onDetach() {
+		LogWrapper.d(Definitions.GoogleMapFragLogTag,"onDetach");
 	    callBack = null;
 	    super.onDetach();
 	}

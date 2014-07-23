@@ -8,28 +8,23 @@ import android.support.v7.app.ActionBar;
 import android.widget.ListView;
 
 import com.citybike.R;
-import com.citybike.pantallainicio.FragmentFactory.FragmentFactory;
-import com.citybike.pantallainicio.FragmentFactory.NavigationFragmentFactory;
 import com.citybike.utils.Definitions;
 import com.citybike.utils.LogWrapper;
 
 public abstract class ReplaceFragment {
-	private FragmentFactory fragmentFactory;
 	private PantallaInicio activity;
 	private int position;
 	private String itemName;
 	
 	public ReplaceFragment(PantallaInicio activity) {
 		this.activity = activity;
-		fragmentFactory= new NavigationFragmentFactory();
 	}
 	public PantallaInicio getActivity() {
 		return activity;
 	}
 	public void start(){
 		LogWrapper.d(Definitions.ReplaceFragmentLogTag,"Item name: "+itemName);
-		Fragment fragment=fragmentFactory.create(itemName);
-		logFragmentCreationResult(fragment);
+		Fragment fragment=activity.getFragments().get(position);
 		LogWrapper.d(Definitions.ReplaceFragmentLogTag,
 							"Obtengo fragment Manager");
 		FragmentManager fragmentManager = 
@@ -73,14 +68,6 @@ public abstract class ReplaceFragment {
 		drawerLayout.closeDrawer(activity.getDrawerList());
 		LogWrapper.d(Definitions.ReplaceFragmentLogTag,
 							"changeTitleToActionBar..OK");
-		
-	}
-	private void logFragmentCreationResult(Fragment fragment) {
-		if (fragment != null) 
-			LogWrapper.d(Definitions.ReplaceFragmentLogTag,
-										"Fragment creado!!");
-		else LogWrapper.e(Definitions.ReplaceFragmentLogTag,
-										"fragment e null!!");
 		
 	}
 	public void setPosition(int position) {

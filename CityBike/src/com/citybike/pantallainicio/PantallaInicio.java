@@ -5,8 +5,11 @@ import com.citybike.R;
 import com.citybike.pantallainicio.FragmentFactory.FragmentFactory;
 import com.citybike.pantallainicio.FragmentFactory.NavigationFragmentFactory;
 import com.citybike.pantallainicio.Fragments.DialogInviteContacts;
+import com.citybike.pantallainicio.Fragments.FragmentMap;
+import com.citybike.pantallainicio.Fragments.GoogleMapFragment.OnGoogleMapFragmentListener;
 import com.citybike.utils.Definitions;
 import com.citybike.utils.LogWrapper;
+import com.google.android.gms.maps.GoogleMap;
 
 import android.annotation.SuppressLint;
 import android.content.res.Configuration;
@@ -27,15 +30,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class PantallaInicio extends ActionBarActivity {
+public class PantallaInicio extends ActionBarActivity implements OnGoogleMapFragmentListener{
     private DrawerLayout drawerLayout;
     private ListView drawerList;
     private String tituloFragmentSeleccionado;
     private DrawerToggle drawerToggle; 
     private FragmentFactory fragmentFactory;
     private List<Map<String, Object>> optionList;
-    private ReplaceFragment replaceFragment=null;
-	@Override
+    private Map<Integer,Fragment> fragments;
+    private  NavigationListener navigationListener;
+    @Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		LogWrapper.d(Definitions.mainLogTag,
@@ -43,9 +47,9 @@ public class PantallaInicio extends ActionBarActivity {
         setContentView(R.layout.layout_pantalla_inicio); 
         LogWrapper.d(Definitions.mainLogTag,
         			"setContentView(layout_pantalla_inicio)... OK");  
-        replaceFragment= new PantallaInicioReplaceFragment(this);
-        addInitialFragment();
+        new PantallaInicioReplaceFragment(this);
 		createApplicationMainOptions();       
+		addInitialFragment();
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
 	}	
@@ -53,18 +57,19 @@ public class PantallaInicio extends ActionBarActivity {
 		LogWrapper.d(Definitions.mainLogTag,"addInitialFragment()");
         FragmentManager fragmentManager = getSupportFragmentManager();
         LogWrapper.d(Definitions.mainLogTag,"getSupportFragmentManager ... OK");
-        fragmentFactory= new NavigationFragmentFactory();
-        Fragment fragment=fragmentFactory.create(Definitions.home);
         FragmentTransaction fragmentTransaction=
         									fragmentManager.beginTransaction();
         LogWrapper.d(Definitions.mainLogTag,"FragmentTransaction ...OK");
-        addAndLog(fragmentTransaction,fragment);
+        addAndLog(fragmentTransaction,fragments.get(0));
         fragmentTransaction.commit();  
         LogWrapper.d(Definitions.mainLogTag,
         			"fragmentTransaction.commit()... OK");
         LogWrapper.d(Definitions.mainLogTag,
         			"Se asignó por defecto en la pantalla principal el fragment"
         			+ " base");	
+	}
+	public Map<Integer, Fragment> getFragments() {
+		return fragments;
 	}
 	private void addAndLog(FragmentTransaction fragmentTransaction,
 												Fragment fragment) {
@@ -75,8 +80,11 @@ public class PantallaInicio extends ActionBarActivity {
         fragmentTransaction.addToBackStack(Definitions.home);
 		
 	}
+	@SuppressLint("UseSparseArrays")
 	private void createApplicationMainOptions() {
 		LogWrapper.d(Definitions.mainLogTag,"createApplicationMainOptions()");
+		fragmentFactory= new NavigationFragmentFactory();
+		fragments= new HashMap<Integer,Fragment>();
 		assignDrawerToggleToDrawerLayout();
         createNavigationOptions();
 	}
@@ -106,7 +114,7 @@ public class PantallaInicio extends ActionBarActivity {
         optionList=new ArrayList<Map<String,Object>>();
         addItemsToOptionList();
         setAdapterToDrawerList(drawerList);
-        NavigationListener navigationListener=new NavigationListener();
+        navigationListener=new NavigationListener();
         navigationListener.setReplaceFragment(
         					new NavigationListenerReplaceFragment(this));
         drawerList.setOnItemClickListener(navigationListener);
@@ -196,7 +204,9 @@ public class PantallaInicio extends ActionBarActivity {
 		LogWrapper.d(Definitions.mainLogTag,
 					"Agrego el mapa a la lista de opciones");
 		optionList.add(optionsMap);
+		Fragment fragment=fragmentFactory.create(appLabel);
 		Integer pos=optionList.size()-1;
+		fragments.put(pos, fragment);
 		LogWrapper.d(Definitions.mainLogTag,
 					"(pos,item): ("+pos+","+appLabel+")");
 	}
@@ -250,21 +260,36 @@ public class PantallaInicio extends ActionBarActivity {
         LogWrapper.d(Definitions.mainLogTag, "User pressed the back button");
         FragmentManager fragmentManager = getSupportFragmentManager();
         int numberOfEntriesInStack=fragmentManager.getBackStackEntryCount();
-        if (numberOfEntriesInStack>0){
-        	int stackTopPosition=numberOfEntriesInStack-1;
-        	BackStackEntry backStackEntry=
-        				fragmentManager.getBackStackEntryAt(stackTopPosition);
-        	fragmentManager.popBackStack(backStackEntry.getId(),
-        				FragmentManager.POP_BACK_STACK_INCLUSIVE);
-        	String itemName= backStackEntry.getName();
-        	 LogWrapper.d(Definitions.mainLogTag,
-        			 "Va a pasar al fragment anterior: "+itemName);
-        	((PantallaInicioReplaceFragment)replaceFragment).
-        									setPositionAnItemName(itemName);
-        	((PantallaInicioReplaceFragment)replaceFragment).start();
-        }
+        if (numberOfEntriesInStack>0)
+        	removeLastFragmentAndPopFromBackStack(fragmentManager,
+        									numberOfEntriesInStack);
 	}
 	
+	private void removeLastFragmentAndPopFromBackStack(
+			FragmentManager fragmentManager, int numberOfEntriesInStack) {
+		int stackTopPosition=numberOfEntriesInStack-1;
+		String itemName= getItemNameAt(fragmentManager,stackTopPosition);
+		removeLastFragmentFromBackStack(fragmentManager,itemName);
+		//itemName=getItemNameAt(fragmentManager,stackTopPosition-1);
+		 LogWrapper.d(Definitions.mainLogTag,
+				 "Va a pasar al fragment anterior: "+itemName);		 
+		 //replaceFragment(itemName);
+	}
+	private String getItemNameAt(FragmentManager fragmentManager,
+										int stackTopPosition) {
+		BackStackEntry backStackEntry=
+						fragmentManager.getBackStackEntryAt(stackTopPosition);
+		return backStackEntry.getName();
+		
+	}
+	private void removeLastFragmentFromBackStack(
+			FragmentManager fragmentManager, String itemName) {
+		LogWrapper.d(Definitions.mainLogTag,
+				"Sale al stack: "+itemName);
+		fragmentManager.popBackStack(itemName,
+				FragmentManager.POP_BACK_STACK_INCLUSIVE);
+		
+	}
 	public void setTituloFragmentSeleccionado(
 											String tituloFragmentSeleccionado) {
 		this.tituloFragmentSeleccionado = tituloFragmentSeleccionado;
@@ -291,6 +316,14 @@ public class PantallaInicio extends ActionBarActivity {
 	public String getItemName(int position){
 		Map<String, Object> item=optionList.get(position);
 		return (String )item.get(Definitions.appName);
+	}
+	@Override
+	public void onMapReady(GoogleMap mMap) {
+		Fragment currentFragment=
+				fragments.get(navigationListener.getCurrentPositionItemClick());
+		if (currentFragment instanceof FragmentMap )
+			((FragmentMap)currentFragment).onMapReady(mMap);
+		
 	}
 
 }
