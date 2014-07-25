@@ -26,4 +26,5 @@ public class Definitions {
 	public static final String ReplaceFragmentLogTag ="ReplaceFragment";
 	public static final String fragmentProfile ="Fragment Perfil";
 	public static final String GoogleMapFragLogTag = "GoogleMap Fragment";
+	public static final String fragmentHomeMapTag ="fragmentHomeMapTag";
 }

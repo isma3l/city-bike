@@ -9,6 +9,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
 import com.google.android.gms.maps.model.LatLng;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -74,7 +75,7 @@ public class FragmentCircuitos extends FragmentMap{
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-		LogWrapper.d(Definitions.FragmentCircuitLogTag,"Seteo listener");
+		LogWrapper.d(Definitions.FragmentCircuitLogTag,"onViewCreated");
 		b_borrarCircuito.setOnClickListener(new OnClickListener() {			
 			@Override
 			public void onClick(View v) {
@@ -120,6 +121,7 @@ public class FragmentCircuitos extends FragmentMap{
 		});	
 	}
 	public void setUpMap() {
+		LogWrapper.d(Definitions.FragmentCircuitLogTag,"setUpMap");
 		getmMap().setOnMapClickListener(new OnMapClickListener(
 				) {
 			@Override
@@ -136,9 +138,56 @@ public class FragmentCircuitos extends FragmentMap{
 	}
 	@Override
 	public void onDestroyView() {
-		LogWrapper.d(Definitions.FragListLogTag,"ckto destruidoooooo");
+		LogWrapper.d(Definitions.FragmentCircuitLogTag,"onDestroyView");
 		destroyView(R.id.map_circuitos);		
 		super.onDestroyView();
+	}
+	@Override
+	public void onAttach(Activity activity) {
+		// TODO Auto-generated method stub
+		super.onAttach(activity);
+		LogWrapper.d(Definitions.FragmentCircuitLogTag,"onAttach");
+	}
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		LogWrapper.d(Definitions.FragmentCircuitLogTag,"onDestroy");
+	}
+	@Override
+	public void onDetach() {
+		// TODO Auto-generated method stub
+		super.onDetach();
+		LogWrapper.d(Definitions.FragmentCircuitLogTag,"onDetach");
+	}
+	@Override
+	public void onPause() {
+		// TODO Auto-generated method stub
+		super.onPause();
+		LogWrapper.d(Definitions.FragmentCircuitLogTag,"onPause");
+	}
+	@Override
+	public void onStart() {
+		// TODO Auto-generated method stub
+		super.onStart();
+		LogWrapper.d(Definitions.FragmentCircuitLogTag,"onStart");
+	}
+	@Override
+	public void onStop() {
+		// TODO Auto-generated method stub
+		super.onStop();
+		LogWrapper.d(Definitions.FragmentCircuitLogTag,"onStop");
+	}
+	@Override
+	public void onViewStateRestored(Bundle savedInstanceState) {
+		// TODO Auto-generated method stub
+		super.onViewStateRestored(savedInstanceState);
+		LogWrapper.d(Definitions.FragmentCircuitLogTag,"onViewStateRestored");
+	}
+	@Override
+	public void onResume() {
+		LogWrapper.d(Definitions.FragmentCircuitLogTag,"onResume");
+		super.onResume();
+//		replaceIdMapByGoogleMap(R.id.map_circuitos,null);
 	}
 }
 

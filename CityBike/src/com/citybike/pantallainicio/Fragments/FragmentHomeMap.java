@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.json.JSONObject;
 
+import android.app.Activity;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -58,6 +59,7 @@ public class FragmentHomeMap extends FragmentMap{
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		LogWrapper.d(Definitions.fragmentHomeMapTag,"onCreate()");
 		CENTRO = new LatLng(-34.60, -58.38);
 		CSVBicicleterias = "bicicleterias.csv";
 		CSVEstaciones = "estaciones.csv";
@@ -73,7 +75,7 @@ public class FragmentHomeMap extends FragmentMap{
 	public View onCreateView(LayoutInflater inflater,
 							ViewGroup container,
 							Bundle savedInstanceState) {
-		 LogWrapper.d(Definitions.fragmentMapTag,"onCreateView()");
+		 LogWrapper.d(Definitions.fragmentHomeMapTag,"onCreateView()");
 		View view = inflater.inflate(R.layout.fragment_pantalla_principal,
 									container,
 									false);			
@@ -89,18 +91,19 @@ public class FragmentHomeMap extends FragmentMap{
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		 LogWrapper.d(Definitions.fragmentMapTag,"onActivityCreated()");
+		 LogWrapper.d(Definitions.fragmentHomeMapTag,"onActivityCreated()");
 		 replaceIdMapByGoogleMap(R.id.map,savedInstanceState);
 	}
 	@Override
 	public void onDetach() {
 		super.onDetach();
-		getGoogleMapFragment().onDetach();
+		LogWrapper.d(Definitions.fragmentHomeMapTag,"onDetach()");
+//		getGoogleMapFragment().onDetach();
 	}
 	@Override
 	public void onViewCreated(View view,Bundle savedInstanceState) {
 		super.onViewCreated(view,savedInstanceState);
-		LogWrapper.d(Definitions.fragmentMapTag,"onViewCreated()");
+		LogWrapper.d(Definitions.fragmentHomeMapTag,"onViewCreated()");
 		b_bicicleteria.setOnClickListener(new OnClickListener() {			
 			@Override
 			public void onClick(View v) {
@@ -161,6 +164,7 @@ public class FragmentHomeMap extends FragmentMap{
 		});
 	}
 	public void setUpMap() {
+		LogWrapper.d(Definitions.fragmentHomeMapTag,"setUpMap()");
         getmMap().moveCamera(CameraUpdateFactory.newLatLngZoom(CENTRO, 11));
         colocarMarcadoresBicicleterias(CSVBicicleterias);
         colocarMarcadoresEstaciones(CSVEstaciones);
@@ -175,10 +179,53 @@ public class FragmentHomeMap extends FragmentMap{
 	 */
 	@Override
 	public void onDestroyView() {
+		LogWrapper.d(Definitions.fragmentHomeMapTag,"onDestroy()");
 		destroyView(R.id.map);
 		super.onDestroyView();
 	}
 	
+	@Override
+	public void onResume() {
+		super.onResume();
+		LogWrapper.d(Definitions.fragmentHomeMapTag,"onResume()");
+//		replaceIdMapByGoogleMap(R.id.map,null);
+	}
+	@Override
+	public void onAttach(Activity activity) {
+		// TODO Auto-generated method stub
+		super.onAttach(activity);
+		LogWrapper.d(Definitions.fragmentHomeMapTag,"onAttach()");
+	}
+	@Override
+	public void onDestroy() {
+		// TODO Auto-generated method stub
+		super.onDestroy();
+		LogWrapper.d(Definitions.fragmentHomeMapTag,"onDestroy()");
+	}
+	@Override
+	public void onPause() {
+		// TODO Auto-generated method stub
+		super.onPause();
+		LogWrapper.d(Definitions.fragmentHomeMapTag,"onPause()");
+	}
+	@Override
+	public void onStart() {
+		// TODO Auto-generated method stub
+		super.onStart();
+		LogWrapper.d(Definitions.fragmentHomeMapTag,"onStart()");
+	}
+	@Override
+	public void onStop() {
+		// TODO Auto-generated method stub
+		super.onStop();
+		LogWrapper.d(Definitions.fragmentHomeMapTag,"onStop()");
+	}
+	@Override
+	public void onViewStateRestored(Bundle savedInstanceState) {
+		// TODO Auto-generated method stub
+		super.onViewStateRestored(savedInstanceState);
+		LogWrapper.d(Definitions.fragmentHomeMapTag,"onViewStateRestored()");
+	}
 	private ArrayList<MarkerOptions> generarMarcadoresBicicleterias(String rutaCSV){
 		ParserCSV.cargarParser(getResources());
 		ArrayList<String[]> lineas = ParserCSV.parsearArchivo(rutaCSV, 9);
