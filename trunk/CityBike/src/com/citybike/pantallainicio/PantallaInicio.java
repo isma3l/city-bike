@@ -30,15 +30,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class PantallaInicio extends ActionBarActivity implements OnGoogleMapFragmentListener{
+public class PantallaInicio extends ActionBarActivity 
+										implements OnGoogleMapFragmentListener{
     private DrawerLayout drawerLayout;
     private ListView drawerList;
     private String tituloFragmentSeleccionado;
     private DrawerToggle drawerToggle; 
     private FragmentFactory fragmentFactory;
     private List<Map<String, Object>> optionList;
-    private Map<Integer,Fragment> fragments;
     private  NavigationListener navigationListener;
+    private Fragment initialFragment;
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -46,10 +47,10 @@ public class PantallaInicio extends ActionBarActivity implements OnGoogleMapFrag
 					"onCreate()... Comienzo del ciclo de vida de la actividad");
         setContentView(R.layout.layout_pantalla_inicio); 
         LogWrapper.d(Definitions.mainLogTag,
-        			"setContentView(layout_pantalla_inicio)... OK");  
-        new PantallaInicioReplaceFragment(this);
+        			"setContentView(layout_pantalla_inicio)... OK"); 
+        fragmentFactory= NavigationFragmentFactory.getInstance();
+        addInitialFragment();
 		createApplicationMainOptions();       
-		addInitialFragment();
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
 	}	
@@ -60,7 +61,11 @@ public class PantallaInicio extends ActionBarActivity implements OnGoogleMapFrag
         FragmentTransaction fragmentTransaction=
         									fragmentManager.beginTransaction();
         LogWrapper.d(Definitions.mainLogTag,"FragmentTransaction ...OK");
-        addAndLog(fragmentTransaction,fragments.get(0));
+        initialFragment=fragmentFactory.create(Definitions.home);
+        fragmentTransaction.add(R.id.content_frame,initialFragment,Definitions.home);
+        LogWrapper.d(Definitions.mainLogTag,
+        			"fragmentTransaction.add(R.id.content_frame, "
+        			+ "new FragmentBase()) ... OK");
         fragmentTransaction.commit();  
         LogWrapper.d(Definitions.mainLogTag,
         			"fragmentTransaction.commit()... OK");
@@ -68,23 +73,9 @@ public class PantallaInicio extends ActionBarActivity implements OnGoogleMapFrag
         			"Se asignó por defecto en la pantalla principal el fragment"
         			+ " base");	
 	}
-	public Map<Integer, Fragment> getFragments() {
-		return fragments;
-	}
-	private void addAndLog(FragmentTransaction fragmentTransaction,
-												Fragment fragment) {
-		fragmentTransaction.add(R.id.content_frame,fragment,Definitions.home);
-        LogWrapper.d(Definitions.mainLogTag,
-        			"fragmentTransaction.add(R.id.content_frame, "
-        			+ "new FragmentBase()) ... OK");
-        fragmentTransaction.addToBackStack(Definitions.home);
-		
-	}
 	@SuppressLint("UseSparseArrays")
 	private void createApplicationMainOptions() {
 		LogWrapper.d(Definitions.mainLogTag,"createApplicationMainOptions()");
-		fragmentFactory= new NavigationFragmentFactory();
-		fragments= new HashMap<Integer,Fragment>();
 		assignDrawerToggleToDrawerLayout();
         createNavigationOptions();
 	}
@@ -114,9 +105,7 @@ public class PantallaInicio extends ActionBarActivity implements OnGoogleMapFrag
         optionList=new ArrayList<Map<String,Object>>();
         addItemsToOptionList();
         setAdapterToDrawerList(drawerList);
-        navigationListener=new NavigationListener();
-        navigationListener.setReplaceFragment(
-        					new NavigationListenerReplaceFragment(this));
+        navigationListener=new NavigationListener(this);
         drawerList.setOnItemClickListener(navigationListener);
         LogWrapper.d(Definitions.mainLogTag,
         			"Cuando se toca un item en drawerList se invoca a "
@@ -142,48 +131,19 @@ public class PantallaInicio extends ActionBarActivity implements OnGoogleMapFrag
 	}
 	private void addItemsToOptionList() {
 		LogWrapper.d(Definitions.mainLogTag,"addItemsToOptionList()");
-		addOption(Definitions.appIcon,
-				R.drawable.home,
-				Definitions.appName,
-				Definitions.home);	
-	LogWrapper.d(Definitions.mainLogTag,
-				"Se agregó la fila con el icono y el texto: "
-				+Definitions.profile);
-		addOption(Definitions.appIcon,
-					R.drawable.profile,
-					Definitions.appName,
-					Definitions.profile);	
+		addAndLogItem(R.drawable.home,Definitions.home);
+		addAndLogItem(R.drawable.profile,Definitions.profile);
+		addAndLogItem(R.drawable.contactos,Definitions.contact);
+		addAndLogItem(R.drawable.eventos,Definitions.event);
+		addAndLogItem(R.drawable.circuitos,Definitions.circuits);
+		addAndLogItem(R.drawable.dolar,Definitions.bePremium);
+	}
+	private void addAndLogItem(int drawableId,String itemName){
+		addOption(Definitions.appIcon,drawableId,Definitions.appName,itemName);	
 		LogWrapper.d(Definitions.mainLogTag,
-					"Se agregó la fila con el icono y el texto: "
-					+Definitions.profile);
-		addOption(Definitions.appIcon,
-					R.drawable.contactos,
-					Definitions.appName,
-					Definitions.contact);
-		LogWrapper.d(Definitions.mainLogTag,
-					"Se agregó la fila con el icono y el texto: "
-					+Definitions.contact);
-		addOption(Definitions.appIcon,
-					R.drawable.eventos,
-					Definitions.appName,
-					Definitions.event);
-		LogWrapper.d(Definitions.mainLogTag,
-					"Se agregó la fila con el icono y el texto: "
-					+Definitions.event);
-		addOption(Definitions.appIcon,
-					R.drawable.circuitos,
-					Definitions.appName,
-					Definitions.circuits);
-		LogWrapper.d(Definitions.mainLogTag,
-					"Se agregó la fila con el icono y el texto: "
-					+Definitions.circuits);
-		addOption(Definitions.appIcon,
-					R.drawable.dolar,
-					Definitions.appName,
-					Definitions.bePremium);		
-		LogWrapper.d(Definitions.mainLogTag,
-					"Se agregó la fila con el icono y el texto: "
-					+Definitions.bePremium);
+					"Se agregó la fila con "
+					+ "el icono y el texto: "
+									+itemName);
 	}
 	private void addOption(String colIconApp,
 							Integer iconId,
@@ -204,9 +164,7 @@ public class PantallaInicio extends ActionBarActivity implements OnGoogleMapFrag
 		LogWrapper.d(Definitions.mainLogTag,
 					"Agrego el mapa a la lista de opciones");
 		optionList.add(optionsMap);
-		Fragment fragment=fragmentFactory.create(appLabel);
 		Integer pos=optionList.size()-1;
-		fragments.put(pos, fragment);
 		LogWrapper.d(Definitions.mainLogTag,
 					"(pos,item): ("+pos+","+appLabel+")");
 	}
@@ -254,42 +212,6 @@ public class PantallaInicio extends ActionBarActivity implements OnGoogleMapFrag
 	public boolean onPrepareOptionsMenu(Menu menu) { 	  
 	    return super.onPrepareOptionsMenu(menu);
 	}
-	@Override
-	public void onBackPressed() {
-		super.onBackPressed();
-        LogWrapper.d(Definitions.mainLogTag, "User pressed the back button");
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        int numberOfEntriesInStack=fragmentManager.getBackStackEntryCount();
-        if (numberOfEntriesInStack>0)
-        	removeLastFragmentAndPopFromBackStack(fragmentManager,
-        									numberOfEntriesInStack);
-	}
-	
-	private void removeLastFragmentAndPopFromBackStack(
-			FragmentManager fragmentManager, int numberOfEntriesInStack) {
-		int stackTopPosition=numberOfEntriesInStack-1;
-		String itemName= getItemNameAt(fragmentManager,stackTopPosition);
-		removeLastFragmentFromBackStack(fragmentManager,itemName);
-		//itemName=getItemNameAt(fragmentManager,stackTopPosition-1);
-		 LogWrapper.d(Definitions.mainLogTag,
-				 "Va a pasar al fragment anterior: "+itemName);		 
-		 //replaceFragment(itemName);
-	}
-	private String getItemNameAt(FragmentManager fragmentManager,
-										int stackTopPosition) {
-		BackStackEntry backStackEntry=
-						fragmentManager.getBackStackEntryAt(stackTopPosition);
-		return backStackEntry.getName();
-		
-	}
-	private void removeLastFragmentFromBackStack(
-			FragmentManager fragmentManager, String itemName) {
-		LogWrapper.d(Definitions.mainLogTag,
-				"Sale al stack: "+itemName);
-		fragmentManager.popBackStack(itemName,
-				FragmentManager.POP_BACK_STACK_INCLUSIVE);
-		
-	}
 	public void setTituloFragmentSeleccionado(
 											String tituloFragmentSeleccionado) {
 		this.tituloFragmentSeleccionado = tituloFragmentSeleccionado;
@@ -319,10 +241,18 @@ public class PantallaInicio extends ActionBarActivity implements OnGoogleMapFrag
 	}
 	@Override
 	public void onMapReady(GoogleMap mMap) {
-		Fragment currentFragment=
-				fragments.get(navigationListener.getCurrentPositionItemClick());
-		if (currentFragment instanceof FragmentMap )
-			((FragmentMap)currentFragment).onMapReady(mMap);
+		Fragment currentFragment=navigationListener.getCurrentFragment();
+		checkIfFragmentIsMapAndOnMapReadySetUp(
+				currentFragment!=null ? currentFragment:initialFragment,mMap);	
+	}
+	private void checkIfFragmentIsMapAndOnMapReadySetUp(Fragment fragment,
+														GoogleMap mMap) {
+		if (fragment instanceof FragmentMap ){
+			LogWrapper.d(Definitions.mainLogTag,
+					 "onMapReady");	
+			((FragmentMap)fragment).onMapReady(mMap);
+		}else LogWrapper.d(Definitions.mainLogTag,
+				 "El fragmento no es instancia de FragmentMap");
 		
 	}
 

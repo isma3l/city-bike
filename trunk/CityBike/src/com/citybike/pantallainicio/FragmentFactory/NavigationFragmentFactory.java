@@ -11,7 +11,20 @@ import com.citybike.utils.Definitions;
 import android.support.v4.app.Fragment;
 
 public class NavigationFragmentFactory implements FragmentFactory {
-
+	private static NavigationFragmentFactory INSTANCE=null;
+	private NavigationFragmentFactory(){}
+	private static void createInstance(){
+		if (INSTANCE==null){
+			synchronized(NavigationFragmentFactory.class){
+				if (INSTANCE==null)
+					INSTANCE=new NavigationFragmentFactory();
+			}
+		}
+	}
+	public static NavigationFragmentFactory getInstance(){
+		createInstance();
+		return INSTANCE;
+	}
 	@Override
 	public Fragment create(String type) {
 		if (type.equals(Definitions.home))

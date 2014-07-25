@@ -39,8 +39,12 @@ public class GoogleMapFragment extends SupportMapFragment {
 		LogWrapper.d(Definitions.GoogleMapFragLogTag,"onCreateView()");
 		 View view = super.onCreateView(inflater, container, savedInstanceState);
 	        if (callBack != null) {
+	        	LogWrapper.d(Definitions.GoogleMapFragLogTag,
+						"callback NO es null");
 	            callBack.onMapReady(getMap());
-	        }
+	        }else 
+	        	LogWrapper.d(Definitions.GoogleMapFragLogTag,
+	        							"callback es null");
 	        return view;
 	}
 	@Override

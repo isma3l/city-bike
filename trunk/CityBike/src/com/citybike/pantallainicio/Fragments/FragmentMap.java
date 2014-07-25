@@ -8,16 +8,19 @@ import android.support.v4.app.FragmentTransaction;
 import com.citybike.pantallainicio
 					.Fragments.GoogleMapFragment
 					.OnGoogleMapFragmentListener;
+import com.citybike.utils.Definitions;
+import com.citybike.utils.LogWrapper;
 import com.google.android.gms.maps.GoogleMap;
 
 public abstract class FragmentMap extends Fragment 
 										implements OnGoogleMapFragmentListener{
 	private GoogleMap mMap;	
 	private GoogleMapFragment googleMapFragment;
-	public GoogleMapFragment getGoogleMapFragment() {
+	/*public GoogleMapFragment getGoogleMapFragment() {
 		return googleMapFragment;
-	}
+	}*/
 	public void replaceIdMapByGoogleMap(int IdMap,Bundle savedInstanceState) {
+		LogWrapper.d(Definitions.fragmentMapTag,"replaceIdMapByGoogleMap");
 		FragmentManager fm = getChildFragmentManager();
 	    googleMapFragment = (GoogleMapFragment) fm.findFragmentById(IdMap);
 	    if (googleMapFragment == null) {
@@ -29,6 +32,7 @@ public abstract class FragmentMap extends Fragment
 		
 	}
 	public void destroyView(int IdMap) {
+		LogWrapper.d(Definitions.fragmentMapTag,"destroyView");
 		FragmentManager fm = getChildFragmentManager();
 		googleMapFragment = (GoogleMapFragment) fm.findFragmentById(IdMap);
 		if (googleMapFragment != null) {
@@ -48,7 +52,10 @@ public abstract class FragmentMap extends Fragment
 	}
 	@Override
 	public void onMapReady(GoogleMap mMap) {
+		LogWrapper.d(Definitions.fragmentMapTag,"onMapReady");
 		this.mMap=mMap;
+		if (this.mMap==null) 
+			LogWrapper.e(Definitions.fragmentMapTag,"El Mapa es null!!!");
 		setUpMap();
 	}
 	public abstract void setUpMap();
