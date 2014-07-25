@@ -80,7 +80,7 @@ public class MainActivity extends FragmentActivity{
 	
 	private void createAndStoreMainFragments() {
 		preAndPostLogInFragments=new HashMap<String,Fragment>();
-		fragmentFactory= new PreAndPostLogInFragmentFactory(this);
+		fragmentFactory= PreAndPostLogInFragmentFactory.getInstance(this);
 		Fragment splashFragment=fragmentFactory.create(Definitions.SPLASH);
 		Fragment selectionFragment=
 								fragmentFactory.create(Definitions.SELECTION);
