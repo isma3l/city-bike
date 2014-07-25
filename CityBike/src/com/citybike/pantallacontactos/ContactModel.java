@@ -1,11 +1,13 @@
 package com.citybike.pantallacontactos;
 
-public class ContactsRowManager {
+public class ContactModel {
 	private String name;
+	private String mail;
 	private boolean selected;
 
-	public ContactsRowManager(String name) {
+	public ContactModel(String name, String mail) {
 	    this.name = name;
+	    this.mail = mail;
 	    selected = false;
 	}
 
@@ -15,6 +17,10 @@ public class ContactsRowManager {
 
 	public void setName(String name) {
 	    this.name = name;
+	}
+	
+	public String getMail() {
+	    return mail;
 	}
 
 	public boolean isSelected() {

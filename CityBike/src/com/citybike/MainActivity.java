@@ -17,6 +17,7 @@ import com.facebook.UiLifecycleHelper;
 import com.facebook.widget.LoginButton;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -25,6 +26,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.widget.EditText;
 
 public class MainActivity extends FragmentActivity{
+		
 	private Map<String,Fragment> preAndPostLogInFragments;
 	private FragmentFactory fragmentFactory;
 	private boolean isResumed = false;
@@ -38,7 +40,10 @@ public class MainActivity extends FragmentActivity{
 	    	LogWrapper.d(Definitions.mainActivityLogTag,"Session state changed");
 	        onSessionStateChange(session, state, exception);
 	    }
-	};	
+	};
+	public static final String USERSDATABASE = "usersDataBaseMock";
+	public static final String CONTACTSDATABASE = "contactsDataBase";
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -55,7 +60,24 @@ public class MainActivity extends FragmentActivity{
 	    transaction.commit();
 	    uiHelper = new UiLifecycleHelper(this, callback);
 	    uiHelper.onCreate(savedInstanceState);
+	    
+	    initializeUsersDatabase();
 	}
+	
+	private void initializeUsersDatabase(){
+	    SharedPreferences registeredUsers = getSharedPreferences(USERSDATABASE, MODE_PRIVATE);
+	    SharedPreferences.Editor editor = registeredUsers.edit();
+	    editor.putString("leandro.miguenz@gmail.com", "Leandro Miguenz");
+	    editor.putString("rodrigo.sanzone@gmail.com", "Rodrigo Sanzone");
+	    editor.putString("guillermo.constantino@gmail.com", "Guillermo Constantino");
+	    editor.putString("luis.ali@gmail.com", "Luis Ali");
+	    editor.putString("karlo.ismael@gmail.com", "Karlo Ismael Oviedo");
+	    editor.putString("victoria.perello@gmail.com", "Victoria Perello");
+	    editor.putString("alejandro.torrado@gmail.com", "Alejandro Torrado");
+	    //Comiteo los cambios al archivo
+	    editor.commit();
+	}
+	
 	private void createAndStoreMainFragments() {
 		preAndPostLogInFragments=new HashMap<String,Fragment>();
 		fragmentFactory= new PreAndPostLogInFragmentFactory(this);
@@ -97,6 +119,9 @@ public class MainActivity extends FragmentActivity{
 	    super.onPause();
 	    uiHelper.onPause();
 	    isResumed = false;
+	    
+
+
 	}
 
 	@Override

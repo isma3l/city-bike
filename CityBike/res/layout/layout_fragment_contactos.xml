@@ -22,10 +22,4 @@
         android:background="#FFFFFF"
         android:text="" />
 
-    <Button
-        android:id="@+id/id_b_eliminar_seleccionados"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Eliminar seleccionados" />
-
 </LinearLayout>

@@ -13,12 +13,12 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.TextView;
 
-public class ContactListArrayAdapter extends ArrayAdapter<ContactsRowManager> {
+public class ContactListArrayAdapter extends ArrayAdapter<ContactModel> {
 
-	  private final List<ContactsRowManager> list;
+	  private final List<ContactModel> list;
 	  private final Fragment context;
 
-	  public ContactListArrayAdapter(Fragment context, List<ContactsRowManager> list) {
+	  public ContactListArrayAdapter(Fragment context, List<ContactModel> list) {
 		  super(context.getActivity() , R.layout.contacts_row_layout, list);
 		  this.context = context;
 		  this.list = list;
@@ -42,7 +42,7 @@ public class ContactListArrayAdapter extends ArrayAdapter<ContactsRowManager> {
 
 		    	  @Override
 		    	  public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-		    		  ContactsRowManager element = (ContactsRowManager) viewHolder.checkbox.getTag();
+		    		  ContactModel element = (ContactModel) viewHolder.checkbox.getTag();
 		              element.setSelected(buttonView.isChecked());
 		    	  }
 	          });
