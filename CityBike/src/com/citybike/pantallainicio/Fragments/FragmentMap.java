@@ -24,6 +24,7 @@ public abstract class FragmentMap extends Fragment
 		FragmentManager fm = getChildFragmentManager();
 	    googleMapFragment = (GoogleMapFragment) fm.findFragmentById(IdMap);
 	    if (googleMapFragment == null) {
+	    	LogWrapper.d(Definitions.fragmentMapTag,"Entra a reemplazar");
 	    	googleMapFragment = GoogleMapFragment.newInstance(savedInstanceState);
 	        FragmentTransaction fragmentTransaction=fm.beginTransaction();
 	        fragmentTransaction.replace(IdMap, googleMapFragment);
@@ -37,6 +38,7 @@ public abstract class FragmentMap extends Fragment
 		googleMapFragment = (GoogleMapFragment) fm.findFragmentById(IdMap);
 		if (googleMapFragment != null) {
 	        try {
+	        	LogWrapper.d(Definitions.fragmentMapTag,"entra a borrar");
 	            getFragmentManager().beginTransaction()
 	            					.remove(googleMapFragment)
 	            					.commit();

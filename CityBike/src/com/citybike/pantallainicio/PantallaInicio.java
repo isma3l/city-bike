@@ -39,7 +39,7 @@ public class PantallaInicio extends ActionBarActivity
     private FragmentFactory fragmentFactory;
     private List<Map<String, Object>> optionList;
     private  NavigationListener navigationListener;
-    private Fragment initialFragment;
+    private List<Fragment> fragments;
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -49,30 +49,11 @@ public class PantallaInicio extends ActionBarActivity
         LogWrapper.d(Definitions.mainLogTag,
         			"setContentView(layout_pantalla_inicio)... OK"); 
         fragmentFactory= NavigationFragmentFactory.getInstance();
-        addInitialFragment();
-		createApplicationMainOptions();       
+        fragments=new ArrayList<Fragment>();
+        createApplicationMainOptions();      
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
 	}	
-	private void addInitialFragment() {
-		LogWrapper.d(Definitions.mainLogTag,"addInitialFragment()");
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        LogWrapper.d(Definitions.mainLogTag,"getSupportFragmentManager ... OK");
-        FragmentTransaction fragmentTransaction=
-        									fragmentManager.beginTransaction();
-        LogWrapper.d(Definitions.mainLogTag,"FragmentTransaction ...OK");
-        initialFragment=fragmentFactory.create(Definitions.home);
-        fragmentTransaction.add(R.id.content_frame,initialFragment,Definitions.home);
-        LogWrapper.d(Definitions.mainLogTag,
-        			"fragmentTransaction.add(R.id.content_frame, "
-        			+ "new FragmentBase()) ... OK");
-        fragmentTransaction.commit();  
-        LogWrapper.d(Definitions.mainLogTag,
-        			"fragmentTransaction.commit()... OK");
-        LogWrapper.d(Definitions.mainLogTag,
-        			"Se asignó por defecto en la pantalla principal el fragment"
-        			+ " base");	
-	}
 	@SuppressLint("UseSparseArrays")
 	private void createApplicationMainOptions() {
 		LogWrapper.d(Definitions.mainLogTag,"createApplicationMainOptions()");
@@ -144,6 +125,20 @@ public class PantallaInicio extends ActionBarActivity
 					"Se agregó la fila con "
 					+ "el icono y el texto: "
 									+itemName);
+		fragments.add(fragmentFactory.create(itemName));
+		int position=fragments.size()-1;
+		 FragmentManager fragmentManager = getSupportFragmentManager();
+	     LogWrapper.d(Definitions.mainLogTag,"getSupportFragmentManager... OK");
+	     FragmentTransaction fragmentTransaction=
+	        								fragmentManager.beginTransaction();
+		fragmentTransaction.add(R.id.content_frame,
+								fragments.get(position),
+								getItemName(position));
+        if (position==0) 
+        	fragmentTransaction.show(fragments.get(position));
+        else
+        	fragmentTransaction.hide(fragments.get(position));
+        fragmentTransaction.commit(); 
 	}
 	private void addOption(String colIconApp,
 							Integer iconId,
@@ -243,7 +238,7 @@ public class PantallaInicio extends ActionBarActivity
 	public void onMapReady(GoogleMap mMap) {
 		Fragment currentFragment=navigationListener.getCurrentFragment();
 		checkIfFragmentIsMapAndOnMapReadySetUp(
-				currentFragment!=null ? currentFragment:initialFragment,mMap);	
+				currentFragment!=null ? currentFragment:fragments.get(0),mMap);	
 	}
 	private void checkIfFragmentIsMapAndOnMapReadySetUp(Fragment fragment,
 														GoogleMap mMap) {
@@ -254,6 +249,9 @@ public class PantallaInicio extends ActionBarActivity
 		}else LogWrapper.d(Definitions.mainLogTag,
 				 "El fragmento no es instancia de FragmentMap");
 		
+	}
+	public Fragment getFragment(int position) {
+		return fragments.get(position);
 	}
 
 }

@@ -27,4 +27,14 @@ public class Definitions {
 	public static final String fragmentProfile ="Fragment Perfil";
 	public static final String GoogleMapFragLogTag = "GoogleMap Fragment";
 	public static final String fragmentHomeMapTag ="fragmentHomeMapTag";
+	public static final String LatLog = "LatLongCentro";
+	public static final String CsvBicicleterias = "bicicleterias.csv";
+	public static final String CsvEstaciones = "estaciones.csv";
+	public static final String bicicleterias = "Lista marker options bicicleterias";
+	public static final String estaciones = "Lista marker options estaciones";
+	public static final String RouteManager = "Route manager";
+	public static final String Polyline = "PolyLineOptions";
+	public static final String mostrandoBicicleterias = "mostrando bicicleterias";
+	public static final String mostrandoEstaciones = "mostrando estaciones";
+	public static final String routesButtonToggle = "routes button toggle";
 }

@@ -3,6 +3,9 @@ package com.citybike.pantallainicio;
 import com.citybike.R;
 import com.citybike.pantallainicio.FragmentFactory.FragmentFactory;
 import com.citybike.pantallainicio.FragmentFactory.NavigationFragmentFactory;
+import com.citybike.pantallainicio.Fragments.FragmentCircuitos;
+import com.citybike.pantallainicio.Fragments.FragmentHomeMap;
+import com.citybike.pantallainicio.Fragments.FragmentMap;
 import com.citybike.utils.Definitions;
 import com.citybike.utils.LogWrapper;
 
@@ -18,14 +21,12 @@ import android.widget.AdapterView.OnItemClickListener;
 
 public class NavigationListener  implements OnItemClickListener {
 	private PantallaInicio pantallaInicio;
-	private FragmentFactory fragmentFactory;
 	private Fragment currentFragment;
 	
 	public NavigationListener(PantallaInicio pantallaInicio) {
 		super();
 		this.pantallaInicio = pantallaInicio;
-		fragmentFactory= NavigationFragmentFactory.getInstance();
-		currentFragment=null;
+		currentFragment=pantallaInicio.getFragment(0);
 	}
 	@Override
 	public void onItemClick(AdapterView<?> parent, 
@@ -66,7 +67,8 @@ public class NavigationListener  implements OnItemClickListener {
 	private void replace(int position){
 		String itemName=getItemNameFromPosition(position);
 		LogWrapper.d(Definitions.ReplaceFragmentLogTag,"Item name: "+itemName);
-		currentFragment=fragmentFactory.create(itemName);
+		Fragment previousFragment=currentFragment;
+		currentFragment=pantallaInicio.getFragment(position);
 		LogWrapper.d(Definitions.ReplaceFragmentLogTag,
 							"Obtengo fragment Manager");
 		FragmentManager fragmentManager = 
@@ -74,8 +76,10 @@ public class NavigationListener  implements OnItemClickListener {
 		LogWrapper.d(Definitions.ReplaceFragmentLogTag,"Reemplazo de fragment");
 		LogWrapper.d(Definitions.ReplaceFragmentLogTag,"Begin transaction");
 		FragmentTransaction transaction=fragmentManager.beginTransaction();
-		LogWrapper.d(Definitions.ReplaceFragmentLogTag,"transaction.replace()");
-		transaction.replace(R.id.content_frame, currentFragment,itemName);
+		LogWrapper.d(Definitions.ReplaceFragmentLogTag,"transaction.hide() && show()");
+		checkIfFragmentIsMapAndDestroyIt(previousFragment);
+		transaction.hide(previousFragment);
+		transaction.show(currentFragment);
 		LogWrapper.d(Definitions.ReplaceFragmentLogTag,"transaction.commit()");
 		transaction.commit();
 		LogWrapper.d(Definitions.ReplaceFragmentLogTag,
@@ -86,6 +90,26 @@ public class NavigationListener  implements OnItemClickListener {
 							"seteo item checked en true");
 		drawerList.setItemChecked(position, true); 
 		changeTitleToActionBar(itemName);
+	}
+	private void checkIfFragmentIsMapAndDestroyIt(Fragment previousFragment) {
+		if ((previousFragment instanceof FragmentMap)&&(currentFragment instanceof FragmentMap)){
+			LogWrapper.d(Definitions.ReplaceFragmentLogTag,"El anterior es un mapa");
+			if (previousFragment instanceof FragmentHomeMap)
+				((FragmentHomeMap)previousFragment).destroyView(R.id.map);
+			else
+				((FragmentCircuitos)previousFragment).destroyView(R.id.map_circuitos);
+			checkCurrentFragmentOnEqualMapThenLoad();
+		}
+		
+	}
+	private void checkCurrentFragmentOnEqualMapThenLoad() {
+		if (currentFragment instanceof FragmentHomeMap)
+			((FragmentHomeMap)currentFragment).
+										replaceIdMapByGoogleMap(R.id.map,null);
+		else
+			((FragmentCircuitos)currentFragment).
+						  	replaceIdMapByGoogleMap(R.id.map_circuitos,null);
+		
 	}
 	public Fragment getCurrentFragment() {
 		return currentFragment;
