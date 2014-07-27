@@ -11,28 +11,26 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-public class FragmentPerfil extends Fragment{
-	private final String LOG_TAG = "test";   
-	public static FragmentPerfil newInstance(Bundle args){
-		FragmentPerfil FragmentPerfil=new FragmentPerfil();
-		if (args !=null) 
+public class FragmentPerfil extends Fragment {
+	private final String LOG_TAG = "test";
+
+	public static FragmentPerfil newInstance(Bundle args) {
+		FragmentPerfil FragmentPerfil = new FragmentPerfil();
+		if (args != null)
 			FragmentPerfil.setArguments(args);
 		return FragmentPerfil;
 	}
-	@Override
-	public View onCreateView(
-			LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
 
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		Log.v(LOG_TAG, "dentro del oncreateview del fragment 1");
-		return inflater.inflate(R.layout.layout_fragment_perfil,
-														container,
-														false);
+		
+		return inflater.inflate(R.layout.layout_fragment_perfil, container, false);
 	}
 
 	@Override
 	public void onResume() {
 		super.onResume();
-		LogWrapper.d(Definitions.fragmentProfile,"onResume()");
+		LogWrapper.d(Definitions.fragmentProfile, "onResume()");
 	}
 }
