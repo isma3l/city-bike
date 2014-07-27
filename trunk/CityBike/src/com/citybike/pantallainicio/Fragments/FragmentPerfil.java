@@ -13,11 +13,11 @@ import android.view.ViewGroup;
 
 public class FragmentPerfil extends Fragment{
 	private final String LOG_TAG = "test";   
-	public static FragmentEventos newInstance(Bundle args){
-		FragmentEventos fragmentEventos=new FragmentEventos();
+	public static FragmentPerfil newInstance(Bundle args){
+		FragmentPerfil FragmentPerfil=new FragmentPerfil();
 		if (args !=null) 
-			fragmentEventos.setArguments(args);
-		return fragmentEventos;
+			FragmentPerfil.setArguments(args);
+		return FragmentPerfil;
 	}
 	@Override
 	public View onCreateView(

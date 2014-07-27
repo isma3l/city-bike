@@ -8,11 +8,11 @@ import android.view.View;
 import android.view.ViewGroup;
 
 public class FragmentPremium extends Fragment{
-	public static FragmentEventos newInstance(Bundle args){
-		FragmentEventos fragmentEventos=new FragmentEventos();
+	public static FragmentPremium newInstance(Bundle args){
+		FragmentPremium FragmentPremium=new FragmentPremium();
 		if (args !=null) 
-			fragmentEventos.setArguments(args);
-		return fragmentEventos;
+			FragmentPremium.setArguments(args);
+		return FragmentPremium;
 	}
 	   @Override
 	    public View onCreateView(
