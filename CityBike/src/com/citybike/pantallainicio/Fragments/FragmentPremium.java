@@ -7,20 +7,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-public class FragmentPremium extends Fragment{
-	public static FragmentPremium newInstance(Bundle args){
-		FragmentPremium FragmentPremium=new FragmentPremium();
-		if (args !=null) 
+public class FragmentPremium extends Fragment {
+	public static FragmentPremium newInstance(Bundle args) {
+		FragmentPremium FragmentPremium = new FragmentPremium();
+		if (args != null)
 			FragmentPremium.setArguments(args);
 		return FragmentPremium;
 	}
-	   @Override
-	    public View onCreateView(
-	        LayoutInflater inflater, ViewGroup container,
-	        Bundle savedInstanceState) {
-	 
-	        return inflater.inflate(R.layout.layout_fragment_premium,
-	        												container,
-	        												false);
-	    }
+
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		return inflater.inflate(R.layout.layout_fragment_premium, container, false);
+	}
 }

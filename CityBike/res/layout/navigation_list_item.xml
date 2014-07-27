@@ -6,8 +6,8 @@
 
     <ImageView
         android:id="@+id/appIcon"
-        android:layout_width="50dp"
-        android:layout_height="50dp" />
+        android:layout_width="48dp"
+        android:layout_height="48dp" />
 
     <TextView
         android:id="@+id/appName"
@@ -15,7 +15,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_toRightOf="@+id/appIcon"
-        android:paddingLeft="5dp"
+        android:paddingLeft="10dp"
+        android:textColor="#c5c5c5"
         android:textSize="18sp"
         android:textStyle="bold" />
 
