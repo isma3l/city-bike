@@ -16,7 +16,7 @@ public class DialogInviteContacts extends DialogFragment {
 		alert.setSingleChoiceItems(getNombreContactos(),0 ,null);
 		
 		//hardcodedddddd
-		boolean [] isSelect = {false,false,false,false,false,false};
+		boolean [] isSelect = {false,false,false,false,false,false,false};
 		alert.setMultiChoiceItems(getNombreContactos(), isSelect , 
 				new OnMultiChoiceClickListener() {					
 					@Override
@@ -41,8 +41,8 @@ public class DialogInviteContacts extends DialogFragment {
 	// harcoded, deberia ir en otra clase que le provea esos datos 
 	// de la memoria interna, etc
 		private String[] getNombreContactos() {
-			String[] nombres= {"Leo Messi", "Neymar da Silva", "Cristiano Ronaldo", "Fernando Torres", 
-					"Wayne Rooney", "Sergio Agüero"};
+			String[] nombres= {"Rodrigo", "Leandro", "Victoria", "Luis", 
+					"Guille", "Alejandro","Karlo"};
 			return nombres;
 		}
 

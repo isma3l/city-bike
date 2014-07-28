@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="10dp"
+    android:background="@drawable/rectevent"
+    android:orientation="horizontal"
+    android:weightSum="0.3" >
+
+    <ImageView
+        android:id="@+id/id_image_event"
+        android:layout_width="150dp"
+        android:layout_height="120dp"
+        android:layout_marginBottom="6dp"
+        android:layout_marginTop="6dp"
+        android:layout_marginLeft="6dp"
+        android:background="@android:color/transparent" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="8dp"
+        android:gravity="center_vertical"
+        android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/id_text_title_events"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="Eventoooo"
+            android:textColor="#000000"
+            android:textSize="30dp"
+            android:textStyle="normal"
+            android:typeface="normal" />
+
+        <TextView
+            android:id="@+id/id_text_content_events"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="14/05  | 12:00hr"
+            android:textColor="#666666"
+            android:textSize="20dp"
+            android:textStyle="normal" />
+
+    </LinearLayout>
+
+</LinearLayout>
