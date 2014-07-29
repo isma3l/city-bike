@@ -10,6 +10,8 @@ import com.citybike.pantallainicio.Fragments.GoogleMapFragment.OnGoogleMapFragme
 import com.citybike.utils.Definitions;
 import com.citybike.utils.LogWrapper;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
+import com.google.android.gms.maps.model.LatLng;
 
 import android.annotation.SuppressLint;
 import android.content.res.Configuration;
@@ -31,7 +33,8 @@ import java.util.List;
 import java.util.Map;
 
 public class PantallaInicio extends ActionBarActivity 
-										implements OnGoogleMapFragmentListener{
+										implements OnGoogleMapFragmentListener,
+										OnMapClickListener{
     private DrawerLayout drawerLayout;
     private ListView drawerList;
     private String tituloFragmentSeleccionado;
@@ -236,22 +239,43 @@ public class PantallaInicio extends ActionBarActivity
 	}
 	@Override
 	public void onMapReady(GoogleMap mMap) {
+		doCallBackOnMapReadyOrOnMapClick(mMap,null);
+	}
+	private void doCallBackOnMapReadyOrOnMapClick(GoogleMap mMap,LatLng point){
 		Fragment currentFragment=navigationListener.getCurrentFragment();
 		checkIfFragmentIsMapAndOnMapReadySetUp(
-				currentFragment!=null ? currentFragment:fragments.get(0),mMap);	
+				currentFragment!=null ? currentFragment:fragments.get(0),
+				mMap,
+				point);
 	}
 	private void checkIfFragmentIsMapAndOnMapReadySetUp(Fragment fragment,
-														GoogleMap mMap) {
-		if (fragment instanceof FragmentMap ){
-			LogWrapper.d(Definitions.mainLogTag,
-					 "onMapReady");	
-			((FragmentMap)fragment).onMapReady(mMap);
-		}else LogWrapper.d(Definitions.mainLogTag,
-				 "El fragmento no es instancia de FragmentMap");
+														GoogleMap mMap,
+														LatLng point) {
+		if (fragment instanceof FragmentMap )
+			if (point==null)
+				logAnCallBackMapReady(fragment,mMap);
+			else
+				logAndCallBackMapClick(fragment,point);
 		
+	}
+	private void logAndCallBackMapClick(Fragment fragment, LatLng point) {
+		LogWrapper.d(Definitions.mainLogTag,
+				 "onMapClick");	
+		((FragmentMap)fragment).onMapClick(point);
+		
+	}
+	private void logAnCallBackMapReady(Fragment fragment, GoogleMap mMap) {
+		LogWrapper.d(Definitions.mainLogTag,
+				 "onMapReady");	
+		((FragmentMap)fragment).onMapReady(mMap);
 	}
 	public Fragment getFragment(int position) {
 		return fragments.get(position);
+	}
+	@Override
+	public void onMapClick(LatLng point) {
+		doCallBackOnMapReadyOrOnMapClick(null,point);
+		
 	}
 
 }

@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ToggleButton;
 
 import com.citybike.R;
 import com.citybike.pantallamapa.RouteManager;
@@ -41,13 +42,13 @@ public class FragmentHomeMap extends FragmentMap{
 	private ArrayList<Marker> estaciones;
 	private boolean mostrandoBicicleterias;
 	private boolean mostrandoEstaciones;
+	boolean showingRoute;
 	private RouteManager routeManager;
 	private Polyline routeView;
 	private PolylineOptions polyLineOptions;
-	private boolean routesButtonToggle;
 	private Button b_bicicleteria;
 	private Button b_estaciones;
-	private Button b_rutas;
+	private ToggleButton b_rutas;
 	
 	private ArrayList<MarkerOptions> marcadoresEstaciones;
 	private ArrayList<MarkerOptions> marcadoresBicicleterias;
@@ -69,6 +70,7 @@ public class FragmentHomeMap extends FragmentMap{
 		routeView = null;
 		bicicleterias = new ArrayList<Marker>();
 		estaciones = new ArrayList<Marker>();
+
 	}
 	private void restoreSavedValues(Bundle savedInstanceState) {
 		LogWrapper.d(Definitions.fragmentHomeMapTag,"restoreSavedValues()");
@@ -79,7 +81,6 @@ public class FragmentHomeMap extends FragmentMap{
 		polyLineOptions=savedInstanceState.getParcelable(Definitions.Polyline);
 		mostrandoBicicleterias=savedInstanceState.getBoolean(Definitions.mostrandoBicicleterias);
 		mostrandoEstaciones=savedInstanceState.getBoolean(Definitions.mostrandoEstaciones);
-		routesButtonToggle=savedInstanceState.getBoolean(Definitions.routesButtonToggle);
 	}
 	private void initializeValues() {
 		LogWrapper.d(Definitions.fragmentHomeMapTag,"initializeValues()");
@@ -88,9 +89,9 @@ public class FragmentHomeMap extends FragmentMap{
 		marcadoresBicicleterias = new ArrayList<MarkerOptions>();
 		mostrandoBicicleterias = false;
 		mostrandoEstaciones = false;
+		showingRoute = false;
 		routeManager = new RouteManager();
-		routesButtonToggle = false;
-		
+
 	}
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
@@ -103,7 +104,6 @@ public class FragmentHomeMap extends FragmentMap{
 		outState.putParcelable(Definitions.Polyline,polyLineOptions);
 		outState.putBoolean(Definitions.mostrandoBicicleterias, mostrandoBicicleterias);
 		outState.putBoolean(Definitions.mostrandoEstaciones, mostrandoEstaciones);
-		outState.putBoolean(Definitions.routesButtonToggle,routesButtonToggle);
 		
 	}
 	@Override
@@ -122,13 +122,49 @@ public class FragmentHomeMap extends FragmentMap{
 	private void initializeButton(View view) {
 		b_bicicleteria = (Button) view.findViewById(R.id.id_b_bicleteria);
 		b_estaciones = (Button) view.findViewById(R.id.id_b_bicisendas);
-		b_rutas = (Button) view.findViewById(R.id.id_b_rutas);
+		b_rutas = (ToggleButton) view.findViewById(R.id.id_b_rutas);
+		assignClickListener();
+	}
+	private void assignClickListener() {
+		 b_bicicleteria.setOnClickListener(new OnClickListener() {			
+				@Override
+				public void onClick(View v) {
+					if (!mostrandoBicicleterias){
+						mostrandoBicicleterias = true;					
+					}else{
+						mostrandoBicicleterias = false;
+					}
+					setVisibilidadBicicleterias(mostrandoBicicleterias); 
+				}
+			});
+			
+			/*b_talleres.setOnClickListener(new OnClickListener() {			
+				@Override
+				public void onClick(View v) {
+			        Toast.makeText(getActivity(), "Mostrar talleres en el mapa", Toast.LENGTH_SHORT).show();
+					
+				}
+			});*/
+			
+			b_estaciones.setOnClickListener(new OnClickListener() {			
+				@Override
+				public void onClick(View v) {
+			        //Toast.makeText(getActivity(), "Mostrar bicisendas en el mapa", Toast.LENGTH_SHORT).show();
+			        if (!mostrandoEstaciones){
+			        	mostrandoEstaciones = true;					
+					}else{
+						mostrandoEstaciones = false;
+					}
+					setVisibilidadEstaciones(mostrandoEstaciones); 
+				}
+			});
+		
 	}
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		 LogWrapper.d(Definitions.fragmentHomeMapTag,"onActivityCreated()");
-		 if (savedInstanceState!=null) LogWrapper.d(Definitions.fragmentHomeMapTag,"saved instance no es null!!!!");
+		 
 		 replaceIdMapByGoogleMap(R.id.map,savedInstanceState);
 	}
 	@Override
@@ -142,67 +178,11 @@ public class FragmentHomeMap extends FragmentMap{
 		super.onViewCreated(view,savedInstanceState);
 		LogWrapper.d(Definitions.fragmentHomeMapTag,"onViewCreated()");
 		if (savedInstanceState!=null) LogWrapper.d(Definitions.fragmentHomeMapTag,"saved instance no es null!!!!");
-		b_bicicleteria.setOnClickListener(new OnClickListener() {			
-			@Override
-			public void onClick(View v) {
-				if (!mostrandoBicicleterias){
-					mostrandoBicicleterias = true;					
-				}else{
-					mostrandoBicicleterias = false;
-				}
-				setVisibilidadBicicleterias(mostrandoBicicleterias); 
-			}
-		});
 		
-		/*b_talleres.setOnClickListener(new OnClickListener() {			
-			@Override
-			public void onClick(View v) {
-		        Toast.makeText(getActivity(), "Mostrar talleres en el mapa", Toast.LENGTH_SHORT).show();
-				
-			}
-		});*/
-		
-		b_estaciones.setOnClickListener(new OnClickListener() {			
-			@Override
-			public void onClick(View v) {
-		        //Toast.makeText(getActivity(), "Mostrar bicisendas en el mapa", Toast.LENGTH_SHORT).show();
-		        if (!mostrandoEstaciones){
-		        	mostrandoEstaciones = true;					
-				}else{
-					mostrandoEstaciones = false;
-				}
-				setVisibilidadEstaciones(mostrandoEstaciones); 
-			}
-		});
-		
-		b_rutas.setOnClickListener(new OnClickListener() {			
-			@Override
-			public void onClick(View v) {
-		        if (routesButtonToggle == false){
-		        	routesButtonToggle = true;
-			        getmMap().setOnMapClickListener(new OnMapClickListener(){
-			        	boolean showingRoute = false;
-						@Override
-						public void onMapClick(LatLng point) {
-							if( !showingRoute ){
-								routeManager.addDirection(point);
-								if (routeManager.isRouteCompleted()){
-									String url = routeManager.getRouteQueryURL();
-									ReadTask downloadTask = new ReadTask();
-									downloadTask.execute(url);
-									showingRoute = true;
-								}
-							}
-						}		
-			        });  
-		        }else{
-		        	resetRouteCreation();
-		        }
-			}
-		});
 	}
 	public void setUpMap() {
 		LogWrapper.d(Definitions.fragmentHomeMapTag,"setUpMap()");
+		getmMap().setOnMapClickListener(getPantallaInicio());
         getmMap().moveCamera(CameraUpdateFactory.newLatLngZoom(CENTRO, 11));
         colocarMarcadoresBicicleterias(Definitions.CsvBicicleterias);
         colocarMarcadoresEstaciones(Definitions.CsvEstaciones);
@@ -338,9 +318,11 @@ public class FragmentHomeMap extends FragmentMap{
 	}
 	
 	private void resetRouteCreation(){
+		LogWrapper.d(Definitions.fragmentHomeMapTag,"resetRouteCreation()");
 		routeManager.clear();
 		routeView.remove();
-		routesButtonToggle = false;
+//		b_rutas.setChecked(false);
+		showingRoute=false;
 	}
 	
 	////////////Clases privadas para la consulta de rutas////////////
@@ -389,6 +371,7 @@ public class FragmentHomeMap extends FragmentMap{
 		
 		@Override
 	    protected void onPostExecute(List<List<HashMap<String, String>>> routes) {
+			LogWrapper.d(Definitions.fragmentHomeMapTag,"onPostExcecute() parserTask class");
 			ArrayList<LatLng> points = null;
 			//PolylineOptions polyLineOptions = null;
 	 
@@ -416,5 +399,23 @@ public class FragmentHomeMap extends FragmentMap{
 			routeView = getmMap().addPolyline(polyLineOptions);
 	    }
 
+	}
+
+	@Override
+	public void onMapClick(LatLng point) {
+		if (( !showingRoute)&&(b_rutas.isChecked())){
+			LogWrapper.d(Definitions.fragmentHomeMapTag,"onMapClick() showing route es false");
+			routeManager.addDirection(point);
+			if (routeManager.isRouteCompleted()){
+				LogWrapper.d(Definitions.fragmentHomeMapTag,"onMapClick() la ruta esta completa");
+				String url = routeManager.getRouteQueryURL();
+				ReadTask downloadTask = new ReadTask();
+				downloadTask.execute(url);
+				showingRoute = true;
+			}
+		}else if ((showingRoute)&&(b_rutas.isChecked())) 
+				resetRouteCreation();
+			
+		
 	}
 }
