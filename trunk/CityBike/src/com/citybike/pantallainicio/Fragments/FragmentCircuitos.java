@@ -28,6 +28,7 @@ public class FragmentCircuitos extends FragmentMap{
 	private Button b_invitarContacto;		
 	private ImageButton b_facebook;
 	private Button b_borrarCircuito;
+	private PantallaInicio pantallaInicio;
 	
 	public static FragmentCircuitos newInstance(Bundle args){
 		FragmentCircuitos fragmentCircuitos=new FragmentCircuitos();
@@ -106,8 +107,7 @@ public class FragmentCircuitos extends FragmentMap{
 		b_invitarContacto.setOnClickListener(new OnClickListener() {			
 			@Override
 			public void onClick(View v) {
-				((PantallaInicio)getActivity()).
-											mostrarDialogoInvitarContactos();
+				pantallaInicio.mostrarDialogoInvitarContactos();
 			}
 		});
 		
@@ -122,17 +122,7 @@ public class FragmentCircuitos extends FragmentMap{
 	}
 	public void setUpMap() {
 		LogWrapper.d(Definitions.FragmentCircuitLogTag,"setUpMap");
-		getmMap().setOnMapClickListener(new OnMapClickListener(
-				) {
-			@Override
-			public void onMapClick(LatLng point) {
-				if(circuitManager.isCreated()) {
-					circuitManager.add(point);
-					getmMap().addPolyline(circuitManager.getCircuit());
-				}
-						
-			}
-		});
+		getmMap().setOnMapClickListener(getPantallaInicio());
 	//	mMap.addMarker(new MarkerOptions().position(HAMBURG).title("Marker"));
 		getmMap().moveCamera(CameraUpdateFactory.newLatLngZoom(HAMBURG, 10));
 	}
@@ -147,6 +137,7 @@ public class FragmentCircuitos extends FragmentMap{
 		// TODO Auto-generated method stub
 		super.onAttach(activity);
 		LogWrapper.d(Definitions.FragmentCircuitLogTag,"onAttach");
+		pantallaInicio=(PantallaInicio)activity;
 	}
 	@Override
 	public void onDestroy() {
@@ -188,6 +179,14 @@ public class FragmentCircuitos extends FragmentMap{
 		LogWrapper.d(Definitions.FragmentCircuitLogTag,"onResume");
 		super.onResume();
 //		replaceIdMapByGoogleMap(R.id.map_circuitos,null);
+	}
+	@Override
+	public void onMapClick(LatLng point) {
+		if(circuitManager.isCreated()) {
+			circuitManager.add(point);
+			getmMap().addPolyline(circuitManager.getCircuit());
+		}
+		
 	}
 }
 
