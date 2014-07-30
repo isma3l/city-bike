@@ -63,7 +63,7 @@ public class MainActivity extends FragmentActivity{
 	    
 	    initializeUsersDatabase();
 	}
-	
+
 	private void initializeUsersDatabase(){
 	    SharedPreferences registeredUsers = getSharedPreferences(USERSDATABASE, MODE_PRIVATE);
 	    SharedPreferences.Editor editor = registeredUsers.edit();
