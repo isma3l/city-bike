@@ -243,15 +243,12 @@ public class PantallaInicio extends ActionBarActivity
 	}
 	private void doCallBackOnMapReadyOrOnMapClick(GoogleMap mMap,LatLng point){
 		Fragment currentFragment=navigationListener.getCurrentFragment();
-		checkIfFragmentIsMapAndOnMapReadySetUp(
-				currentFragment!=null ? currentFragment:fragments.get(0),
-				mMap,
-				point);
+		if (currentFragment instanceof FragmentMap )
+			checkIfFragmentIsMapAndOnMapReadySetUp(currentFragment,mMap,point);
 	}
 	private void checkIfFragmentIsMapAndOnMapReadySetUp(Fragment fragment,
 														GoogleMap mMap,
 														LatLng point) {
-		if (fragment instanceof FragmentMap )
 			if (point==null)
 				logAnCallBackMapReady(fragment,mMap);
 			else

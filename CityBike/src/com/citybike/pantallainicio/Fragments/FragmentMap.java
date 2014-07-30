@@ -65,8 +65,10 @@ public abstract class FragmentMap extends Fragment
 	        }
 	    }	
 	}
-	public GoogleMap getmMap() {
-		return mMap;
+	public GoogleMap getMap(int IdMap) {
+		FragmentManager fm = getChildFragmentManager();
+		GoogleMapFragment googleMapFragment = (GoogleMapFragment) fm.findFragmentById(IdMap);
+		return googleMapFragment.getMap();
 	}
 	@Override
 	public void onMapReady(GoogleMap mMap) {
@@ -77,4 +79,5 @@ public abstract class FragmentMap extends Fragment
 		setUpMap();
 	}
 	public abstract void setUpMap();
+	public abstract GoogleMap getMap();
 }

@@ -25,6 +25,7 @@ import com.citybike.utils.LogWrapper;
 import com.citybike.utils.ParserCSV;
 import com.citybike.utils.PathJSONParser;
 import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
@@ -182,8 +183,8 @@ public class FragmentHomeMap extends FragmentMap{
 	}
 	public void setUpMap() {
 		LogWrapper.d(Definitions.fragmentHomeMapTag,"setUpMap()");
-		getmMap().setOnMapClickListener(getPantallaInicio());
-        getmMap().moveCamera(CameraUpdateFactory.newLatLngZoom(CENTRO, 11));
+		getMap().setOnMapClickListener(getPantallaInicio());
+        getMap().moveCamera(CameraUpdateFactory.newLatLngZoom(CENTRO, 11));
         colocarMarcadoresBicicleterias(Definitions.CsvBicicleterias);
         colocarMarcadoresEstaciones(Definitions.CsvEstaciones);
         setVisibilidadBicicleterias(mostrandoBicicleterias);
@@ -274,7 +275,7 @@ public class FragmentHomeMap extends FragmentMap{
 		generarMarcadoresBicicleterias(rutaCSV);
 		
 		for(MarkerOptions marcador : marcadoresBicicleterias){
-			bicicleterias.add( getmMap().addMarker(marcador) );
+			bicicleterias.add( getMap().addMarker(marcador) );
 		}
 	}
 	
@@ -307,7 +308,7 @@ public class FragmentHomeMap extends FragmentMap{
 	private void colocarMarcadoresEstaciones(String rutaCSV){
 		generarMarcadoresEstaciones(rutaCSV);
 		for(MarkerOptions marcador : marcadoresEstaciones){
-			estaciones.add( getmMap().addMarker(marcador) );
+			estaciones.add( getMap().addMarker(marcador) );
 		}
 	}
 	
@@ -323,6 +324,10 @@ public class FragmentHomeMap extends FragmentMap{
 		routeView.remove();
 //		b_rutas.setChecked(false);
 		showingRoute=false;
+	}
+	@Override
+	public GoogleMap getMap(){
+		return getMap(R.id.map);
 	}
 	
 	////////////Clases privadas para la consulta de rutas////////////
@@ -396,26 +401,31 @@ public class FragmentHomeMap extends FragmentMap{
 				polyLineOptions.color(Color.BLUE);
 			}
 	 
-			routeView = getmMap().addPolyline(polyLineOptions);
+			routeView = getMap().addPolyline(polyLineOptions);
 	    }
 
 	}
 
 	@Override
 	public void onMapClick(LatLng point) {
-		if (( !showingRoute)&&(b_rutas.isChecked())){
-			LogWrapper.d(Definitions.fragmentHomeMapTag,"onMapClick() showing route es false");
-			routeManager.addDirection(point);
-			if (routeManager.isRouteCompleted()){
-				LogWrapper.d(Definitions.fragmentHomeMapTag,"onMapClick() la ruta esta completa");
-				String url = routeManager.getRouteQueryURL();
-				ReadTask downloadTask = new ReadTask();
-				downloadTask.execute(url);
-				showingRoute = true;
-			}
-		}else if ((showingRoute)&&(b_rutas.isChecked())) 
+		if (b_rutas.isChecked()){
+			if (!showingRoute){
+				showRoute(point);
+			}else 	
 				resetRouteCreation();
 			
+		}
+	}
+	private void showRoute(LatLng point) {
+		LogWrapper.d(Definitions.fragmentHomeMapTag,"onMapClick() showing route es false");
+		routeManager.addDirection(point);
+		if (routeManager.isRouteCompleted()){
+			LogWrapper.d(Definitions.fragmentHomeMapTag,"onMapClick() la ruta esta completa");
+			String url = routeManager.getRouteQueryURL();
+			ReadTask downloadTask = new ReadTask();
+			downloadTask.execute(url);
+			showingRoute = true;
+		}
 		
 	}
 }

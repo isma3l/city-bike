@@ -77,7 +77,7 @@ public class NavigationListener  implements OnItemClickListener {
 		LogWrapper.d(Definitions.ReplaceFragmentLogTag,"Begin transaction");
 		FragmentTransaction transaction=fragmentManager.beginTransaction();
 		LogWrapper.d(Definitions.ReplaceFragmentLogTag,"transaction.hide() && show()");
-		checkIfFragmentIsMapAndDestroyIt(previousFragment);
+		if (!previousFragment.equals(currentFragment)) checkIfFragmentIsMapAndDestroyIt(previousFragment);
 		transaction.hide(previousFragment);
 		transaction.show(currentFragment);
 		LogWrapper.d(Definitions.ReplaceFragmentLogTag,"transaction.commit()");
