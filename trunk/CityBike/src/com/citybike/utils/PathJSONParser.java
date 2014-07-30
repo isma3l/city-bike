@@ -3,6 +3,7 @@ package com.citybike.utils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -12,7 +13,7 @@ import com.google.android.gms.maps.model.LatLng;
 
 public class PathJSONParser {
 	
-	public List<List<HashMap<String, String>>> parse(JSONObject jObject) {
+	public List<List<HashMap<String, String>>> parseRouteQuery(JSONObject jObject) {
 		List<List<HashMap<String, String>>> routes = new ArrayList<List<HashMap<String, String>>>();
 	    JSONArray jRoutes = null;
 	    JSONArray jLegs = null;
@@ -85,4 +86,22 @@ public class PathJSONParser {
 	    return poly;
 	}
 	
+	
+	public static List<LatLng> parseBikePath(String jsonString){
+		//{"type":"MultiLineString","coordinates":[[[-58.49166,-34.57985],[-58.49107,-34.58061]]]}
+		int beginIndex = jsonString.indexOf("[[[") + 3;
+		int endIndex = jsonString.lastIndexOf("]]]");
+		String pointsRegister = jsonString.substring(beginIndex, endIndex);
+		//-58.49166,-34.57985],[-58.49107,-34.58061
+		String stringPoints[] = pointsRegister.split( Pattern.quote("],[") );
+		//-58.49166,-34.57985
+		ArrayList<LatLng> points = new ArrayList<LatLng>();
+		double lat, lng;
+		for(int i = 0; i < stringPoints.length; i++){
+			lat = Double.parseDouble( stringPoints[i].substring(0, stringPoints[i].indexOf(',')) );
+			lng = Double.parseDouble( stringPoints[i].substring(stringPoints[i].indexOf(',') + 1) );
+			points.add( new LatLng(lat, lng) );
+		}
+		return points;
+	}
 }

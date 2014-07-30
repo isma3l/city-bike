@@ -12,9 +12,8 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.ToggleButton;
 
 import com.citybike.R;
@@ -26,7 +25,6 @@ import com.citybike.utils.ParserCSV;
 import com.citybike.utils.PathJSONParser;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -43,16 +41,21 @@ public class FragmentHomeMap extends FragmentMap{
 	private ArrayList<Marker> estaciones;
 	private boolean mostrandoBicicleterias;
 	private boolean mostrandoEstaciones;
-	boolean showingRoute;
+	private boolean showingRoute;
+	private Marker initialRouteMark;
+	private Marker finalRouteMark;
 	private RouteManager routeManager;
 	private Polyline routeView;
+	private ArrayList<Polyline> bicisendas;
 	private PolylineOptions polyLineOptions;
-	private Button b_bicicleteria;
-	private Button b_estaciones;
+	private ToggleButton b_bicicleteria;
+	private ToggleButton b_estaciones;
 	private ToggleButton b_rutas;
+	private ToggleButton b_bicisendas;
 	
 	private ArrayList<MarkerOptions> marcadoresEstaciones;
 	private ArrayList<MarkerOptions> marcadoresBicicleterias;
+	private ArrayList<PolylineOptions> polilineasBicisendas;
 	
 	public static FragmentHomeMap newInstance(Bundle args){
 		FragmentHomeMap fragmentMapa=new FragmentHomeMap();
@@ -68,7 +71,9 @@ public class FragmentHomeMap extends FragmentMap{
 			initializeValues();
 		else
 			restoreSavedValues(savedInstanceState);
+		
 		routeView = null;
+		bicisendas = new ArrayList<Polyline>();
 		bicicleterias = new ArrayList<Marker>();
 		estaciones = new ArrayList<Marker>();
 
@@ -78,6 +83,7 @@ public class FragmentHomeMap extends FragmentMap{
 		CENTRO=savedInstanceState.getParcelable(Definitions.LatLog);
 		marcadoresBicicleterias=savedInstanceState.getParcelableArrayList(Definitions.bicicleterias);
 		marcadoresEstaciones=savedInstanceState.getParcelableArrayList(Definitions.estaciones);
+		polilineasBicisendas=savedInstanceState.getParcelableArrayList(Definitions.bicisendas);
 		routeManager=savedInstanceState.getParcelable(Definitions.RouteManager);
 		polyLineOptions=savedInstanceState.getParcelable(Definitions.Polyline);
 		mostrandoBicicleterias=savedInstanceState.getBoolean(Definitions.mostrandoBicicleterias);
@@ -88,6 +94,7 @@ public class FragmentHomeMap extends FragmentMap{
 		CENTRO = new LatLng(-34.60, -58.38);
 		marcadoresEstaciones = new ArrayList<MarkerOptions>();
 		marcadoresBicicleterias = new ArrayList<MarkerOptions>();
+		polilineasBicisendas = new ArrayList<PolylineOptions>();
 		mostrandoBicicleterias = false;
 		mostrandoEstaciones = false;
 		showingRoute = false;
@@ -101,6 +108,7 @@ public class FragmentHomeMap extends FragmentMap{
 		outState.putParcelable(Definitions.LatLog,CENTRO);
 		outState.putParcelableArrayList(Definitions.bicicleterias,marcadoresBicicleterias);
 		outState.putParcelableArrayList(Definitions.estaciones,marcadoresEstaciones);
+		outState.putParcelableArrayList(Definitions.bicisendas, polilineasBicisendas);
 		outState.putParcelable(Definitions.RouteManager,routeManager);
 		outState.putParcelable(Definitions.Polyline,polyLineOptions);
 		outState.putBoolean(Definitions.mostrandoBicicleterias, mostrandoBicicleterias);
@@ -121,46 +129,34 @@ public class FragmentHomeMap extends FragmentMap{
 		return view;
 	}
 	private void initializeButton(View view) {
-		b_bicicleteria = (Button) view.findViewById(R.id.id_b_bicleteria);
-		b_estaciones = (Button) view.findViewById(R.id.id_b_bicisendas);
+		b_bicicleteria = (ToggleButton) view.findViewById(R.id.id_b_bicleteria);
+		b_estaciones = (ToggleButton) view.findViewById(R.id.id_b_estaciones);
 		b_rutas = (ToggleButton) view.findViewById(R.id.id_b_rutas);
+		//b_bicisendas = (ToggleButton) view.findViewById(R.id.id_b_bicisendas);
 		assignClickListener();
 	}
+	
 	private void assignClickListener() {
-		 b_bicicleteria.setOnClickListener(new OnClickListener() {			
-				@Override
-				public void onClick(View v) {
-					if (!mostrandoBicicleterias){
-						mostrandoBicicleterias = true;					
-					}else{
-						mostrandoBicicleterias = false;
-					}
-					setVisibilidadBicicleterias(mostrandoBicicleterias); 
-				}
-			});
-			
-			/*b_talleres.setOnClickListener(new OnClickListener() {			
-				@Override
-				public void onClick(View v) {
-			        Toast.makeText(getActivity(), "Mostrar talleres en el mapa", Toast.LENGTH_SHORT).show();
-					
-				}
-			});*/
-			
-			b_estaciones.setOnClickListener(new OnClickListener() {			
-				@Override
-				public void onClick(View v) {
-			        //Toast.makeText(getActivity(), "Mostrar bicisendas en el mapa", Toast.LENGTH_SHORT).show();
-			        if (!mostrandoEstaciones){
-			        	mostrandoEstaciones = true;					
-					}else{
-						mostrandoEstaciones = false;
-					}
-					setVisibilidadEstaciones(mostrandoEstaciones); 
-				}
-			});
 		
+		 b_bicicleteria.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+			    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+			    	setVisibilidadBicicleterias(isChecked);
+			    }
+		 });
+			
+		 /*b_bicisendas.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+		    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+		    	setVisibilidadBicisendas(isChecked);
+		    }
+		});*/
+		
+		b_estaciones.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+		    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+		    	setVisibilidadEstaciones(isChecked);
+		    }
+		});
 	}
+	
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
@@ -187,6 +183,7 @@ public class FragmentHomeMap extends FragmentMap{
         getMap().moveCamera(CameraUpdateFactory.newLatLngZoom(CENTRO, 11));
         colocarMarcadoresBicicleterias(Definitions.CsvBicicleterias);
         colocarMarcadoresEstaciones(Definitions.CsvEstaciones);
+        //colocarBicisendas(Definitions.CsvBicisendas);
         setVisibilidadBicicleterias(mostrandoBicicleterias);
         setVisibilidadEstaciones(mostrandoEstaciones);
     }
@@ -318,10 +315,63 @@ public class FragmentHomeMap extends FragmentMap{
 		}
 	}
 	
+	private void generarBicisendas(String rutaCSV){
+		ParserCSV.cargarParser(getResources());
+		final int CAMPOSBICISENDAS = 16;
+		ArrayList<String[]> lineas = ParserCSV.parsearArchivo(rutaCSV, CAMPOSBICISENDAS);
+		
+		String jsonString = null;
+		List<LatLng> puntosBicisenda = null;
+		boolean encabezado = true;
+		for(String[] linea : lineas){
+			if(!encabezado){
+				jsonString = linea[linea.length - 1];
+				jsonString = jsonString.substring(1, jsonString.length() - 1);
+				if( jsonString != null && !jsonString.startsWith("{") ){
+					continue;
+				}
+				
+		        try{
+		        	puntosBicisenda = PathJSONParser.parseBikePath(jsonString);
+		        }catch(Exception e){
+		        	continue;
+		        }
+		        
+				PolylineOptions polyOptions = new PolylineOptions();
+				//agrega los puntos de la bicisenda a la polyline
+				polyOptions.addAll(puntosBicisenda);
+				polyOptions.width(2);
+				polyOptions.color(Color.CYAN);
+
+				polilineasBicisendas.add(polyOptions);
+			}else{
+				encabezado = false;
+			}
+		}
+		LogWrapper.d(Definitions.fragmentHomeMapTag,"BICISENDAS CREADAS");
+	}
+	
+	private void colocarBicisendas(String rutaCSV){
+		generarBicisendas(rutaCSV);
+		for(PolylineOptions polyOptions : polilineasBicisendas){
+			bicisendas.add( getMap().addPolyline(polyOptions) );
+		}
+		LogWrapper.d(Definitions.fragmentHomeMapTag,"BICISENDAS AGREGADAS");
+	}
+	
+	private void setVisibilidadBicisendas(boolean mostrar){
+		for(Polyline bicisenda : bicisendas){
+			bicisenda.setVisible(mostrar);
+		}
+		LogWrapper.d(Definitions.fragmentHomeMapTag,"BICISENDAS: VISIBILIDAD=" + mostrar);
+	}
+	
 	private void resetRouteCreation(){
 		LogWrapper.d(Definitions.fragmentHomeMapTag,"resetRouteCreation()");
 		routeManager.clear();
 		routeView.remove();
+		initialRouteMark.remove();
+		finalRouteMark.remove();
 //		b_rutas.setChecked(false);
 		showingRoute=false;
 	}
@@ -367,8 +417,8 @@ public class FragmentHomeMap extends FragmentMap{
 		    try {
 		        jObject = new JSONObject(jsonData[0]);
 		        PathJSONParser parser = new PathJSONParser();
-		        routes = parser.parse(jObject);
-	        } catch (Exception e) {
+		        routes = parser.parseRouteQuery(jObject);
+	        } catch (Exception e) { 
 		        e.printStackTrace();
 	        }
 		    return routes;
@@ -388,7 +438,7 @@ public class FragmentHomeMap extends FragmentMap{
 	 
 				for (int j = 0; j < path.size(); j++) {
 					HashMap<String, String> point = path.get(j);
-	 
+					
 					double lat = Double.parseDouble(point.get("lat"));
 					double lng = Double.parseDouble(point.get("lng"));
 					LatLng position = new LatLng(lat, lng);
@@ -398,7 +448,8 @@ public class FragmentHomeMap extends FragmentMap{
 	 
 				polyLineOptions.addAll(points);
 				polyLineOptions.width(2);
-				polyLineOptions.color(Color.BLUE);
+				polyLineOptions.color(Color.GREEN);
+				
 			}
 	 
 			routeView = getMap().addPolyline(polyLineOptions);
@@ -416,16 +467,23 @@ public class FragmentHomeMap extends FragmentMap{
 			
 		}
 	}
+	
 	private void showRoute(LatLng point) {
 		LogWrapper.d(Definitions.fragmentHomeMapTag,"onMapClick() showing route es false");
 		routeManager.addDirection(point);
+		MarkerOptions mark = new MarkerOptions().position(point).visible(true);
 		if (routeManager.isRouteCompleted()){
+			finalRouteMark = getMap().addMarker(mark);
 			LogWrapper.d(Definitions.fragmentHomeMapTag,"onMapClick() la ruta esta completa");
 			String url = routeManager.getRouteQueryURL();
 			ReadTask downloadTask = new ReadTask();
 			downloadTask.execute(url);
 			showingRoute = true;
+		}else{
+			initialRouteMark = getMap().addMarker(mark);
 		}
 		
 	}
+	
+	
 }

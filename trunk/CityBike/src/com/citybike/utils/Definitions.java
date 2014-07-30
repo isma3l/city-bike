@@ -30,8 +30,10 @@ public class Definitions {
 	public static final String LatLog = "LatLongCentro";
 	public static final String CsvBicicleterias = "bicicleterias.csv";
 	public static final String CsvEstaciones = "estaciones.csv";
+	public static final String CsvBicisendas = "ciclovias.csv";
 	public static final String bicicleterias = "Lista marker options bicicleterias";
 	public static final String estaciones = "Lista marker options estaciones";
+	public static final String bicisendas = "Lista polyline bicisendas";
 	public static final String RouteManager = "Route manager";
 	public static final String Polyline = "PolyLineOptions";
 	public static final String mostrandoBicicleterias = "mostrando bicicleterias";
