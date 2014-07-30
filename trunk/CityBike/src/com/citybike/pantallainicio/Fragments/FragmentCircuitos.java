@@ -6,6 +6,7 @@ import com.citybike.pantallainicio.PantallaInicio;
 import com.citybike.utils.Definitions;
 import com.citybike.utils.LogWrapper;
 import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
 import com.google.android.gms.maps.model.LatLng;
 
@@ -70,7 +71,7 @@ public class FragmentCircuitos extends FragmentMap{
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		LogWrapper.d(Definitions.FragmentCircuitLogTag,"onActivityCreated");
-		replaceIdMapByGoogleMap(R.id.map_circuitos,savedInstanceState);
+//		replaceIdMapByGoogleMap(R.id.map_circuitos,savedInstanceState);
 	}
 	
 	@Override
@@ -80,7 +81,7 @@ public class FragmentCircuitos extends FragmentMap{
 		b_borrarCircuito.setOnClickListener(new OnClickListener() {			
 			@Override
 			public void onClick(View v) {
-				getmMap().clear();
+				getMap().clear();
 				circuitManager.clear();
 				
 			}
@@ -122,9 +123,9 @@ public class FragmentCircuitos extends FragmentMap{
 	}
 	public void setUpMap() {
 		LogWrapper.d(Definitions.FragmentCircuitLogTag,"setUpMap");
-		getmMap().setOnMapClickListener(getPantallaInicio());
+		getMap().setOnMapClickListener(getPantallaInicio());
 	//	mMap.addMarker(new MarkerOptions().position(HAMBURG).title("Marker"));
-		getmMap().moveCamera(CameraUpdateFactory.newLatLngZoom(HAMBURG, 10));
+		getMap().moveCamera(CameraUpdateFactory.newLatLngZoom(HAMBURG, 10));
 	}
 	@Override
 	public void onDestroyView() {
@@ -181,11 +182,16 @@ public class FragmentCircuitos extends FragmentMap{
 //		replaceIdMapByGoogleMap(R.id.map_circuitos,null);
 	}
 	@Override
+	public GoogleMap getMap(){
+		return getMap(R.id.map_circuitos);
+	}
+	@Override
 	public void onMapClick(LatLng point) {
 		if(circuitManager.isCreated()) {
 			circuitManager.add(point);
-			getmMap().addPolyline(circuitManager.getCircuit());
-		}
+			if (getMap()==null) LogWrapper.e(Definitions.FragmentCircuitLogTag,"map es NULL");
+			getMap().addPolyline(circuitManager.getCircuit());
+		}else LogWrapper.e(Definitions.FragmentCircuitLogTag,"circuit");
 		
 	}
 }
