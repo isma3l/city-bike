@@ -1,11 +1,11 @@
 package com.citybike.pantallainicio;
 
+import com.citybike.MainActivity;
 import com.citybike.R;
-import com.citybike.pantallainicio.FragmentFactory.FragmentFactory;
-import com.citybike.pantallainicio.FragmentFactory.NavigationFragmentFactory;
 import com.citybike.pantallainicio.Fragments.FragmentCircuitos;
 import com.citybike.pantallainicio.Fragments.FragmentHomeMap;
 import com.citybike.pantallainicio.Fragments.FragmentMap;
+import com.citybike.pantallainicio.Fragments.SelectionFragment;
 import com.citybike.utils.Definitions;
 import com.citybike.utils.LogWrapper;
 
@@ -20,13 +20,14 @@ import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
 
 public class NavigationListener  implements OnItemClickListener {
-	private PantallaInicio pantallaInicio;
+	private SelectionFragment selectionFragment;
 	private Fragment currentFragment;
 	
-	public NavigationListener(PantallaInicio pantallaInicio) {
+	public NavigationListener(SelectionFragment selectionFragment) {
 		super();
-		this.pantallaInicio = pantallaInicio;
-		currentFragment=pantallaInicio.getFragment(0);
+		this.selectionFragment = selectionFragment;
+		currentFragment=selectionFragment.getFragment(0);
+//		this.mainActivity=selectionFragment.getActivity();
 	}
 	@Override
 	public void onItemClick(AdapterView<?> parent, 
@@ -42,24 +43,23 @@ public class NavigationListener  implements OnItemClickListener {
 		LogWrapper.d(Definitions.FragListLogTag,"onItemClick ...OK");
 	}
 	private String getItemNameFromPosition(int position) {
-		return pantallaInicio.getItemName(position);
+		return selectionFragment.getItemName(position);
 	}
 	private void changeTitleToActionBar(String itemName) {
 		LogWrapper.d(Definitions.ReplaceFragmentLogTag,
 								"changeTitleToActionBar");
 		LogWrapper.d(Definitions.ReplaceFragmentLogTag,
 							"Obtengo supportActionBar");
-		ActionBar actionBar=pantallaInicio.getSupportActionBar();
+		ActionBar actionBar=((MainActivity)this.selectionFragment.getActivity()).getSupportActionBar();
 		LogWrapper.d(Definitions.ReplaceFragmentLogTag,
 							"Asigno title a actionBar");
 		actionBar.setTitle(itemName);
 		LogWrapper.d(Definitions.ReplaceFragmentLogTag,
 					"Asigno title a Pantalla_inicio (activity)");
-		pantallaInicio.setTituloFragmentSeleccionado(itemName);
 		LogWrapper.d(Definitions.ReplaceFragmentLogTag,"Obtengo DrawerLayout");
-		DrawerLayout drawerLayout=pantallaInicio.getDrawerLayout();
+		DrawerLayout drawerLayout=selectionFragment.getDrawerLayout();
 		LogWrapper.d(Definitions.ReplaceFragmentLogTag,"Cierro drawer");
-		drawerLayout.closeDrawer(pantallaInicio.getDrawerList());
+		drawerLayout.closeDrawer(selectionFragment.getDrawerList());
 		LogWrapper.d(Definitions.ReplaceFragmentLogTag,
 							"changeTitleToActionBar..OK");
 		
@@ -68,28 +68,31 @@ public class NavigationListener  implements OnItemClickListener {
 		String itemName=getItemNameFromPosition(position);
 		LogWrapper.d(Definitions.ReplaceFragmentLogTag,"Item name: "+itemName);
 		Fragment previousFragment=currentFragment;
-		currentFragment=pantallaInicio.getFragment(position);
+		currentFragment=selectionFragment.getFragment(position);
 		LogWrapper.d(Definitions.ReplaceFragmentLogTag,
 							"Obtengo fragment Manager");
 		FragmentManager fragmentManager = 
-				 					pantallaInicio.getSupportFragmentManager(); 
+				((MainActivity)this.selectionFragment.getActivity()).
+				getSupportFragmentManager(); 
 		LogWrapper.d(Definitions.ReplaceFragmentLogTag,"Reemplazo de fragment");
 		LogWrapper.d(Definitions.ReplaceFragmentLogTag,"Begin transaction");
 		FragmentTransaction transaction=fragmentManager.beginTransaction();
 		LogWrapper.d(Definitions.ReplaceFragmentLogTag,"transaction.hide() && show()");
-		if (!previousFragment.equals(currentFragment)) checkIfFragmentIsMapAndDestroyIt(previousFragment);
-		transaction.hide(previousFragment);
-		transaction.show(currentFragment);
-		LogWrapper.d(Definitions.ReplaceFragmentLogTag,"transaction.commit()");
-		transaction.commit();
-		LogWrapper.d(Definitions.ReplaceFragmentLogTag,
-							"Reemplazo de fragment ok");
-		LogWrapper.d(Definitions.ReplaceFragmentLogTag,"Obtengo drawerlist");
-		ListView drawerList=pantallaInicio.getDrawerList();
-		LogWrapper.d(Definitions.ReplaceFragmentLogTag,
-							"seteo item checked en true");
-		drawerList.setItemChecked(position, true); 
-		changeTitleToActionBar(itemName);
+		if (!previousFragment.equals(currentFragment)){
+			checkIfFragmentIsMapAndDestroyIt(previousFragment);
+			transaction.hide(previousFragment);
+			transaction.show(currentFragment);
+			LogWrapper.d(Definitions.ReplaceFragmentLogTag,"transaction.commit()");
+			transaction.commit();
+			LogWrapper.d(Definitions.ReplaceFragmentLogTag,
+								"Reemplazo de fragment ok");
+			LogWrapper.d(Definitions.ReplaceFragmentLogTag,"Obtengo drawerlist");
+			ListView drawerList=selectionFragment.getDrawerList();
+			LogWrapper.d(Definitions.ReplaceFragmentLogTag,
+								"seteo item checked en true");
+			drawerList.setItemChecked(position, true); 
+			changeTitleToActionBar(itemName);
+		}
 	}
 	private void checkIfFragmentIsMapAndDestroyIt(Fragment previousFragment) {
 		if ((previousFragment instanceof FragmentMap)&&(currentFragment instanceof FragmentMap)){
@@ -98,15 +101,15 @@ public class NavigationListener  implements OnItemClickListener {
 				((FragmentHomeMap)previousFragment).destroyView(R.id.map);
 			else
 				((FragmentCircuitos)previousFragment).destroyView(R.id.map_circuitos);
-			checkCurrentFragmentOnEqualMapThenLoad();
 		}
-		
+		checkCurrentFragmentOnEqualMapThenLoad();
 	}
 	private void checkCurrentFragmentOnEqualMapThenLoad() {
 		if (currentFragment instanceof FragmentHomeMap)
 			((FragmentHomeMap)currentFragment).
 										replaceIdMapByGoogleMap(R.id.map,null);
 		else
+			if (currentFragment instanceof FragmentCircuitos)
 			((FragmentCircuitos)currentFragment).
 						  	replaceIdMapByGoogleMap(R.id.map_circuitos,null);
 		

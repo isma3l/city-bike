@@ -9,12 +9,18 @@ import com.citybike.mainlogin.LogIn;
 import com.citybike.mainlogin.UserLoginTask;
 import com.citybike.pantallainicio.FragmentFactory.FragmentFactory;
 import com.citybike.pantallainicio.FragmentFactory.PreAndPostLogInFragmentFactory;
+import com.citybike.pantallainicio.Fragments.DialogInviteContacts;
+import com.citybike.pantallainicio.Fragments.GoogleMapFragment.OnGoogleMapFragmentListener;
+import com.citybike.pantallainicio.Fragments.SelectionFragment;
 import com.citybike.utils.Definitions;
 import com.citybike.utils.LogWrapper;
 import com.facebook.Session;
 import com.facebook.SessionState;
 import com.facebook.UiLifecycleHelper;
 import com.facebook.widget.LoginButton;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
+import com.google.android.gms.maps.model.LatLng;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -23,9 +29,11 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.ActionBarActivity;
 import android.widget.EditText;
 
-public class MainActivity extends FragmentActivity{
+public class MainActivity extends ActionBarActivity implements OnGoogleMapFragmentListener,
+OnMapClickListener{
 		
 	private Map<String,Fragment> preAndPostLogInFragments;
 	private FragmentFactory fragmentFactory;
@@ -87,7 +95,7 @@ public class MainActivity extends FragmentActivity{
 		preAndPostLogInFragments.put(Definitions.SPLASH,splashFragment);
 		preAndPostLogInFragments.put(Definitions.SELECTION,selectionFragment);
 	}
-	private void showFragment(String fragmentType, boolean addToBackStack) {
+	public void showFragment(String fragmentType, boolean addToBackStack) {
 	    FragmentManager fm = getSupportFragmentManager();
 	    FragmentTransaction transaction = fm.beginTransaction();
 	    for (Map.Entry<String, Fragment> entry : 
@@ -186,8 +194,7 @@ public class MainActivity extends FragmentActivity{
 	    if (session != null && session.isOpened()) {
 	        // if the session is already open,
 	        // try to show the selection fragment
-	        //showFragment(Definitions.SELECTION, false);
-	    	attemptLogin();
+	        showFragment(Definitions.SELECTION, false);
 	    } else {
 	        // otherwise present the splash screen
 	        // and ask the person to login.
@@ -206,4 +213,30 @@ public class MainActivity extends FragmentActivity{
 	public void showProgress(final boolean show) {
 		logIn.showProgress(show);
 	}
+	private void doCallBackOnMapReadyOrOnMapClick(GoogleMap mMap,LatLng point){
+		Fragment fragment=preAndPostLogInFragments.get(Definitions.SELECTION);
+			if (point!=null)
+				((SelectionFragment)fragment).onMapClick(point);
+			else
+				((SelectionFragment)fragment).onMapReady(mMap);
+	}
+	@Override
+	public void onMapClick(LatLng point) {
+		doCallBackOnMapReadyOrOnMapClick(null,point);
+		
+	}
+
+	@Override
+	public void onMapReady(GoogleMap mMap) {
+		doCallBackOnMapReadyOrOnMapClick(mMap,null);
+		
+	}
+	// este metodo se usa para mostrar el dialogo que permite invitar contactos
+		// es el camino mas facil y rapido que encontre, 
+		//no es eficiente ni tiene buen diseño, pero permite mostrar los "contactos"
+		public void mostrarDialogoInvitarContactos() {
+			android.app.FragmentManager fm = getFragmentManager();
+			DialogInviteContacts alert = new DialogInviteContacts();
+			alert.show(fm, "dialog_contact");
+		}
 }

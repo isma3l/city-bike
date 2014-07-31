@@ -1,12 +1,9 @@
 package com.citybike.pantallainicio.Fragments;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-
-import com.citybike.pantallainicio.PantallaInicio;
 import com.citybike.pantallainicio
 					.Fragments.GoogleMapFragment
 					.OnGoogleMapFragmentListener;
@@ -14,25 +11,12 @@ import com.citybike.utils.Definitions;
 import com.citybike.utils.LogWrapper;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
-import com.google.android.gms.maps.model.LatLng;
 
 public abstract class FragmentMap extends Fragment 
 										implements OnGoogleMapFragmentListener,
 										OnMapClickListener{
 	private GoogleMap mMap;	
 	private GoogleMapFragment googleMapFragment;
-	private PantallaInicio pantallaInicio;
-
-	public PantallaInicio getPantallaInicio() {
-		return pantallaInicio;
-	}
-
-
-	@Override
-	public void onAttach(Activity activity) {
-		super.onAttach(activity);
-		pantallaInicio=(PantallaInicio) activity;
-	}
 	
 
 	public void replaceIdMapByGoogleMap(int IdMap,Bundle savedInstanceState) {

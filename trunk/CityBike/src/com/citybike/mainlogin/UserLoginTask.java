@@ -3,7 +3,6 @@ package com.citybike.mainlogin;
 import com.citybike.MainActivity;
 import com.citybike.R;
 import com.citybike.R.string;
-import com.citybike.pantallainicio.PantallaInicio;
 import com.citybike.utils.Definitions;
 import com.citybike.utils.LogWrapper;
 
@@ -67,7 +66,7 @@ public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
 		mainActivity.setmAuthTask(null);
 		mainActivity.showProgress(false);
 		if (success)
-			startActivityPantallaInicio();
+			startHomeMap();
 		else
 			adviceWrongPasswordAndFocusInPasswordEditText();
 	}
@@ -82,11 +81,10 @@ public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
 		mPasswordView.requestFocus();	
 	}
 
-	private void startActivityPantallaInicio() {
+	private void startHomeMap() {
 		LogWrapper.d(Definitions.UserLoginTaskLogTag,
 				"start activity pantalla inicio");
-		Intent intent= new Intent(mainActivity,PantallaInicio.class);
-		mainActivity.startActivity(intent);
+		mainActivity.showFragment(Definitions.SELECTION, false);
 	}
 
 	@Override
