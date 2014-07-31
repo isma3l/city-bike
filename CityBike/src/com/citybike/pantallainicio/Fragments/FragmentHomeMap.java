@@ -6,16 +6,22 @@ import java.util.List;
 
 import org.json.JSONObject;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
+import android.widget.ListView;
 import android.widget.ToggleButton;
 
+import com.citybike.MainActivity;
 import com.citybike.R;
 import com.citybike.pantallamapa.RouteManager;
 import com.citybike.utils.Definitions;
@@ -52,10 +58,12 @@ public class FragmentHomeMap extends FragmentMap{
 	private ToggleButton b_estaciones;
 	private ToggleButton b_rutas;
 	private ToggleButton b_bicisendas;
+	private ListView log_out_listview;
 	
 	private ArrayList<MarkerOptions> marcadoresEstaciones;
 	private ArrayList<MarkerOptions> marcadoresBicicleterias;
 	private ArrayList<PolylineOptions> polilineasBicisendas;
+	private MainActivity mainActivity;
 	
 	public static FragmentHomeMap newInstance(Bundle args){
 		FragmentHomeMap fragmentMapa=new FragmentHomeMap();
@@ -67,27 +75,8 @@ public class FragmentHomeMap extends FragmentMap{
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		LogWrapper.d(Definitions.fragmentHomeMapTag,"onCreate()");
-		if (savedInstanceState==null)
-			initializeValues();
-		else
-			restoreSavedValues(savedInstanceState);
+		initializeValues();		
 		
-		routeView = null;
-		bicisendas = new ArrayList<Polyline>();
-		bicicleterias = new ArrayList<Marker>();
-		estaciones = new ArrayList<Marker>();
-
-	}
-	private void restoreSavedValues(Bundle savedInstanceState) {
-		LogWrapper.d(Definitions.fragmentHomeMapTag,"restoreSavedValues()");
-		CENTRO=savedInstanceState.getParcelable(Definitions.LatLog);
-		marcadoresBicicleterias=savedInstanceState.getParcelableArrayList(Definitions.bicicleterias);
-		marcadoresEstaciones=savedInstanceState.getParcelableArrayList(Definitions.estaciones);
-		polilineasBicisendas=savedInstanceState.getParcelableArrayList(Definitions.bicisendas);
-		routeManager=savedInstanceState.getParcelable(Definitions.RouteManager);
-		polyLineOptions=savedInstanceState.getParcelable(Definitions.Polyline);
-		mostrandoBicicleterias=savedInstanceState.getBoolean(Definitions.mostrandoBicicleterias);
-		mostrandoEstaciones=savedInstanceState.getBoolean(Definitions.mostrandoEstaciones);
 	}
 	private void initializeValues() {
 		LogWrapper.d(Definitions.fragmentHomeMapTag,"initializeValues()");
@@ -99,21 +88,10 @@ public class FragmentHomeMap extends FragmentMap{
 		mostrandoEstaciones = false;
 		showingRoute = false;
 		routeManager = new RouteManager();
-
-	}
-	@Override
-	public void onSaveInstanceState(Bundle outState) {
-		super.onSaveInstanceState(outState);
-		LogWrapper.d(Definitions.fragmentHomeMapTag,"onSaveInstanceState");
-		outState.putParcelable(Definitions.LatLog,CENTRO);
-		outState.putParcelableArrayList(Definitions.bicicleterias,marcadoresBicicleterias);
-		outState.putParcelableArrayList(Definitions.estaciones,marcadoresEstaciones);
-		outState.putParcelableArrayList(Definitions.bicisendas, polilineasBicisendas);
-		outState.putParcelable(Definitions.RouteManager,routeManager);
-		outState.putParcelable(Definitions.Polyline,polyLineOptions);
-		outState.putBoolean(Definitions.mostrandoBicicleterias, mostrandoBicicleterias);
-		outState.putBoolean(Definitions.mostrandoEstaciones, mostrandoEstaciones);
-		
+		routeView = null;
+		bicisendas = new ArrayList<Polyline>();
+		bicicleterias = new ArrayList<Marker>();
+		estaciones = new ArrayList<Marker>();
 	}
 	@Override
 	public View onCreateView(LayoutInflater inflater,
@@ -123,7 +101,6 @@ public class FragmentHomeMap extends FragmentMap{
 		View view = inflater.inflate(R.layout.fragment_pantalla_principal,
 									container,
 									false);	
-		if (savedInstanceState!=null) LogWrapper.d(Definitions.fragmentHomeMapTag,"saved instance no es null!!!!");
 		if (view !=null)
 			initializeButton(view);
 		return view;
@@ -133,9 +110,20 @@ public class FragmentHomeMap extends FragmentMap{
 		b_estaciones = (ToggleButton) view.findViewById(R.id.id_b_estaciones);
 		b_rutas = (ToggleButton) view.findViewById(R.id.id_b_rutas);
 		//b_bicisendas = (ToggleButton) view.findViewById(R.id.id_b_bicisendas);
+		log_out_listview=(ListView) view.findViewById(R.id.log_out_listview);
+		assignValuesToListView();
 		assignClickListener();
 	}
 	
+	private void assignValuesToListView() {
+	    final ArrayList<String> list = new ArrayList<String>();
+	      list.add("salir");
+	      LogWrapper.d(Definitions.fragmentHomeMapTag,"assignValuesToListView()");
+	    final StableArrayAdapter adapter = new StableArrayAdapter(getActivity(),
+	    		R.layout.logout_listview_item, list);
+	    LogWrapper.d(Definitions.fragmentHomeMapTag,"setAdapter()");
+	    log_out_listview.setAdapter(adapter);
+	}
 	private void assignClickListener() {
 		
 		 b_bicicleteria.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -155,31 +143,27 @@ public class FragmentHomeMap extends FragmentMap{
 		    	setVisibilidadEstaciones(isChecked);
 		    }
 		});
+		log_out_listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+		      @Override
+		      public void onItemClick(AdapterView<?> parent, final View view,
+		          int position, long id) {
+		        final String item = (String) parent.getItemAtPosition(position);
+		        LogWrapper.d(Definitions.fragmentHomeMapTag,"Hicieronclick en logout");
+		      }
+
+		    });
 	}
 	
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		 LogWrapper.d(Definitions.fragmentHomeMapTag,"onActivityCreated()");
-		 
+		 LogWrapper.d(Definitions.fragmentHomeMapTag,"onActivityCreated()");		 
 		 replaceIdMapByGoogleMap(R.id.map,savedInstanceState);
-	}
-	@Override
-	public void onDetach() {
-		super.onDetach();
-		LogWrapper.d(Definitions.fragmentHomeMapTag,"onDetach()");
-//		getGoogleMapFragment().onDetach();
-	}
-	@Override
-	public void onViewCreated(View view,Bundle savedInstanceState) {
-		super.onViewCreated(view,savedInstanceState);
-		LogWrapper.d(Definitions.fragmentHomeMapTag,"onViewCreated()");
-		if (savedInstanceState!=null) LogWrapper.d(Definitions.fragmentHomeMapTag,"saved instance no es null!!!!");
-		
 	}
 	public void setUpMap() {
 		LogWrapper.d(Definitions.fragmentHomeMapTag,"setUpMap()");
-		getMap().setOnMapClickListener(getPantallaInicio());
+		getMap().setOnMapClickListener(mainActivity);
         getMap().moveCamera(CameraUpdateFactory.newLatLngZoom(CENTRO, 11));
         colocarMarcadoresBicicleterias(Definitions.CsvBicicleterias);
         colocarMarcadoresEstaciones(Definitions.CsvEstaciones);
@@ -199,42 +183,12 @@ public class FragmentHomeMap extends FragmentMap{
 		destroyView(R.id.map);
 		super.onDestroyView();
 	}
-	
-	@Override
-	public void onResume() {
-		super.onResume();
-		LogWrapper.d(Definitions.fragmentHomeMapTag,"onResume()");
-//		replaceIdMapByGoogleMap(R.id.map,null);
-	}
 	@Override
 	public void onAttach(Activity activity) {
 		// TODO Auto-generated method stub
 		super.onAttach(activity);
 		LogWrapper.d(Definitions.fragmentHomeMapTag,"onAttach()");
-	}
-	@Override
-	public void onDestroy() {
-		// TODO Auto-generated method stub
-		super.onDestroy();
-		LogWrapper.d(Definitions.fragmentHomeMapTag,"onDestroy()");
-	}
-	@Override
-	public void onPause() {
-		// TODO Auto-generated method stub
-		super.onPause();
-		LogWrapper.d(Definitions.fragmentHomeMapTag,"onPause()");
-	}
-	@Override
-	public void onStart() {
-		// TODO Auto-generated method stub
-		super.onStart();
-		LogWrapper.d(Definitions.fragmentHomeMapTag,"onStart()");
-	}
-	@Override
-	public void onStop() {
-		// TODO Auto-generated method stub
-		super.onStop();
-		LogWrapper.d(Definitions.fragmentHomeMapTag,"onStop()");
+		this.mainActivity=(MainActivity)activity;
 	}
 	@Override
 	public void onViewStateRestored(Bundle savedInstanceState) {
@@ -372,14 +326,38 @@ public class FragmentHomeMap extends FragmentMap{
 		routeView.remove();
 		initialRouteMark.remove();
 		finalRouteMark.remove();
-//		b_rutas.setChecked(false);
 		showingRoute=false;
 	}
 	@Override
 	public GoogleMap getMap(){
 		return getMap(R.id.map);
 	}
-	
+////////////Clases privadas para el adaptador del listview logout////////////
+	private class StableArrayAdapter extends ArrayAdapter<String> {
+
+	    HashMap<String, Integer> mIdMap = new HashMap<String, Integer>();
+
+	    public StableArrayAdapter(Context context, int textViewResourceId,
+	        List<String> objects) {
+	      super(context, textViewResourceId, objects);
+	      for (int i = 0; i < objects.size(); ++i) {
+	        mIdMap.put(objects.get(i), i);
+	      }
+	    }
+
+	    @Override
+	    public long getItemId(int position) {
+	      String item = getItem(position);
+	      return mIdMap.get(item);
+	    }
+
+	    @Override
+	    public boolean hasStableIds() {
+	      return true;
+	    }
+
+	  }
+
 	////////////Clases privadas para la consulta de rutas////////////
 	
 	////////////////////ReadTask/////////////////////////

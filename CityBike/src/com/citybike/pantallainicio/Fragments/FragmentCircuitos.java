@@ -1,8 +1,8 @@
 package com.citybike.pantallainicio.Fragments;
 
+import com.citybike.MainActivity;
 import com.citybike.R;
 import com.citybike.pantallainicio.CircuitManager;
-import com.citybike.pantallainicio.PantallaInicio;
 import com.citybike.utils.Definitions;
 import com.citybike.utils.LogWrapper;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -29,7 +29,7 @@ public class FragmentCircuitos extends FragmentMap{
 	private Button b_invitarContacto;		
 	private ImageButton b_facebook;
 	private Button b_borrarCircuito;
-	private PantallaInicio pantallaInicio;
+	private MainActivity mainActivity;
 	
 	public static FragmentCircuitos newInstance(Bundle args){
 		FragmentCircuitos fragmentCircuitos=new FragmentCircuitos();
@@ -108,7 +108,7 @@ public class FragmentCircuitos extends FragmentMap{
 		b_invitarContacto.setOnClickListener(new OnClickListener() {			
 			@Override
 			public void onClick(View v) {
-				pantallaInicio.mostrarDialogoInvitarContactos();
+				mainActivity.mostrarDialogoInvitarContactos();
 			}
 		});
 		
@@ -123,7 +123,7 @@ public class FragmentCircuitos extends FragmentMap{
 	}
 	public void setUpMap() {
 		LogWrapper.d(Definitions.FragmentCircuitLogTag,"setUpMap");
-		getMap().setOnMapClickListener(getPantallaInicio());
+		getMap().setOnMapClickListener(mainActivity);
 	//	mMap.addMarker(new MarkerOptions().position(HAMBURG).title("Marker"));
 		getMap().moveCamera(CameraUpdateFactory.newLatLngZoom(HAMBURG, 10));
 	}
@@ -138,7 +138,7 @@ public class FragmentCircuitos extends FragmentMap{
 		// TODO Auto-generated method stub
 		super.onAttach(activity);
 		LogWrapper.d(Definitions.FragmentCircuitLogTag,"onAttach");
-		pantallaInicio=(PantallaInicio)activity;
+		mainActivity=(MainActivity)activity;
 	}
 	@Override
 	public void onDestroy() {
