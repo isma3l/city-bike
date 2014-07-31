@@ -186,7 +186,8 @@ public class MainActivity extends FragmentActivity{
 	    if (session != null && session.isOpened()) {
 	        // if the session is already open,
 	        // try to show the selection fragment
-	        showFragment(Definitions.SELECTION, false);
+	        //showFragment(Definitions.SELECTION, false);
+	    	attemptLogin();
 	    } else {
 	        // otherwise present the splash screen
 	        // and ask the person to login.
